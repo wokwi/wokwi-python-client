@@ -1,0 +1,21 @@
+# https://docs.astral.sh/ruff/configuration/
+target-version = "py39"
+line-length = 100
+src = ["src", "tests"]
+
+# Enable rule bundles
+lint.select = [
+    "E",  # pycodestyle errors
+    "F",  # pyflakes
+    "I",  # isort
+    "UP", # pyupgrade
+    "PL", # pylint-worthwhile subset
+]
+
+lint.ignore = [
+    "E501", # handled by formatter
+]
+
+# Per-folder overrides --------------------------------------------------------
+[lint.per-file-ignores]
+"tests/**/*.py" = ["PLR2004"] # magic-numbers okay in tests

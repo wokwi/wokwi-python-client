@@ -1,0 +1,32 @@
+# .pre-commit-config.yaml  – patched
+repos:
+    # Ruff: formatter + linter
+    - repo: https://github.com/astral-sh/ruff-pre-commit
+      rev: v0.12.0
+      hooks:
+          - id: ruff-format
+          - id: ruff
+            args: [--fix]
+
+    # mypy (strict)
+    - repo: https://github.com/pre-commit/mirrors-mypy
+      rev: v1.16.1
+      hooks:
+          - id: mypy
+            additional_dependencies: [pydantic==2.8.0, typing-extensions, types-click]
+
+    # Blacken-docs
+    - repo: https://github.com/asottile/blacken-docs
+      rev: "1.19.1"
+      hooks:
+          - id: blacken-docs
+
+    # Basic hygiene hooks (official, maintained)
+    - repo: https://github.com/pre-commit/pre-commit-hooks
+      rev: v5.0.0
+      hooks:
+          - id: end-of-file-fixer
+          - id: trailing-whitespace
+
+default_language_version:
+    python: python3.12

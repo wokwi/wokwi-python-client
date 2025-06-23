@@ -1,0 +1,24 @@
+name: CI
+
+on:
+    push:
+    pull_request:
+        branches:
+            - main
+
+jobs:
+    test:
+        strategy:
+            matrix:
+                py: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+        runs-on: ubuntu-24.04
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/setup-python@v5
+              with:
+                  python-version: ${{ matrix.py }}
+            - run: pip install hatch
+            - run: hatch run ruff format --check .
+            - run: hatch run ruff check .
+            - run: hatch run mypy .
+            - run: hatch run dev:pytest

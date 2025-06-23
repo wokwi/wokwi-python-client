@@ -1,0 +1,58 @@
+# Python artifacts
+__pycache__/
+*.py[cod]
+*.so
+*.pyd
+
+# Packaging / build
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Hatch & virtual-envs
+.hatch/               # local env metadata/cache
+.env/
+.venv/
+venv/
+env/
+env.bak/
+*.virtualenv
+
+# Test & coverage outputs
+.coverage*
+htmlcov/
+.tox/
+.nox/
+pytest_cache/
+.mypy_cache/
+.pytest_cache/
+*.log
+
+# Lint / formatter caches
+.ruff_cache/
+.black/
+.pyre/
+
+# Documentation build (mkdocs)
+site/
+*.html
+
+# IDE/editor settings
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.code-workspace
+
+# OS miscellany
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs & temp files
+*.log
+*.tmp
+*.swp
+*.swo
+*~

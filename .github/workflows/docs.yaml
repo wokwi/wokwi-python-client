@@ -1,0 +1,37 @@
+name: Docs
+
+on:
+    push:
+        branches: [main]
+        paths:
+            - "docs/**"
+            - "mkdocs.yml"
+            - "src/**"
+            - ".github/workflows/docs.yml"
+
+permissions:
+    pages: write
+    id-token: write
+
+jobs:
+    build-deploy:
+        runs-on: ubuntu-24.04
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: actions/setup-python@v5
+              with:
+                  python-version: "3.12"
+
+            - run: pip install hatch
+
+            - name: Build & version docs
+              run: hatch run mkdocs build --strict
+
+            - uses: actions/upload-pages-artifact@v3
+              with:
+                  path: site
+
+            - uses: actions/deploy-pages@v4
+              with:
+                  artifact_name: github-pages

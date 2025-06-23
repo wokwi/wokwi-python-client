@@ -1,0 +1,94 @@
+[build-system]
+requires = ["hatchling>=1.25", "hatch-vcs>=0.4"]
+build-backend = "hatchling.build"
+
+[project]
+name = "wokwi-client"
+dynamic = ["version"]
+description = "Typed, asyncio-friendly Python SDK for the Wokwi Simulation API"
+readme = "README.md"
+authors = [{ name = "Uri Shaked", email = "uri@wokwi.com" }]
+license = "MIT"
+keywords = [
+    "wokwi",
+    "simulation",
+    "api",
+    "python",
+    "asyncio",
+    "esp32",
+    "rp2040",
+    "avr",
+    "arduino",
+]
+requires-python = ">=3.9"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python",
+    "Typing :: Typed",
+    "License :: OSI Approved :: MIT License",
+]
+dependencies = ["pydantic>=2.8"]
+
+[project.urls]
+Documentation = "https://github.com/wokwi/wokwi-python-client#readme"
+Issues = "https://github.com/wokwi/wokwi-python-client/issues"
+Source = "https://github.com/wokwi/wokwi-python-client"
+
+[project.optional-dependencies]
+cli = ["typer[all]>=0.12", "click>=8.1,<9", "types-click"]
+
+
+[project.scripts]
+wokwi-client = "wokwi_client.cli:wokwi_client"
+
+[tool.hatch.version]
+source = "vcs"
+tag-pattern = "v(?P<version>.*)"
+
+[tool.hatch.build.targets.sdist]
+exclude = ["/docs", "/examples"]
+
+[tool.pytest.ini_options]
+addopts = "--strict-markers --cov=wokwi_client --cov-report=term-missing"
+
+# Ruff (acts as both linter and formatter)
+[tool.ruff]
+target-version = "py39"
+line-length = 100
+lint.select = ["E", "F", "I", "UP", "PL"]
+
+[tool.hatch.envs.types]
+extra-dependencies = ["mypy>=1.0.0"]
+[tool.hatch.envs.types.scripts]
+check = "mypy --install-types --non-interactive {args:src/wokwi_client tests}"
+
+[tool.coverage.run]
+source_pkgs = ["wokwi_client", "tests"]
+branch = true
+parallel = true
+omit = ["src/wokwi_client/__about__.py"]
+
+[tool.coverage.paths]
+wokwi_client = ["src/wokwi_client", "*/wokwi-client/src/wokwi_client"]
+tests = ["tests", "*/wokwi-client/tests"]
+
+[tool.coverage.report]
+exclude_lines = ["no cov", "if __name__ == .__main__.:", "if TYPE_CHECKING:"]
+
+[tool.mypy]
+strict = true
+plugins = ["pydantic.mypy"]
+
+[tool.hatch.envs.default]
+dependencies = [
+    "ruff>=0.12.0",
+    "mypy>=1.16.1",
+    "pymdown-extensions",
+    "mkdocs-material[extensions]",
+    "mkdocstrings[python]",
+]
+
+[tool.hatch.envs.dev]
+template = "default"
+features = ["cli"]
+extra-dependencies = ["pytest", "pytest-cov"]

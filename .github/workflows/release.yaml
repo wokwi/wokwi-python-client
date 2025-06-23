@@ -1,0 +1,30 @@
+name: Release
+
+on:
+    push:
+        tags:
+            - "v*.*.*"
+
+permissions:
+    id-token: write # OIDC token for trusted publishing
+    contents: read
+
+jobs:
+    build-and-publish:
+        runs-on: ubuntu-24.04
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: actions/setup-python@v5
+              with:
+                  python-version: "3.12"
+
+            - name: Build wheel & sdist
+              run: |
+                  pip install --quiet hatch
+                  hatch build
+
+            - name: Publish to PyPI
+              uses: pypa/gh-action-pypi-publish@release/v1
+              with:
+                  verbose: true # shows twine output
