@@ -3,17 +3,14 @@
 # SPDX-License-Identifier: MIT
 
 from collections.abc import AsyncGenerator
-from typing import cast
 
-from .protocol_types import EventMessage
+from .event_queue import EventQueue
 from .transport import Transport
 
 
 async def monitor_lines(transport: Transport) -> AsyncGenerator[bytes, None]:
     await transport.request("serial-monitor:listen", {})
-    while True:
-        msg = await transport.recv()
-        if msg["type"] == "event":
-            event_msg = cast(EventMessage, msg)
-            if event_msg["event"] == "serial-monitor:data":
-                yield bytes(event_msg["payload"]["bytes"])
+    with EventQueue(transport, "serial-monitor:data") as queue:
+        while True:
+            event_msg = await queue.get()
+            yield bytes(event_msg["payload"]["bytes"])
