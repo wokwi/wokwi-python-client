@@ -15,6 +15,7 @@ FIRMWARE_FILES = {
     "hello_world.bin": f"{HELLO_WORLD_URL}/hello_world.bin",
     "hello_world.elf": f"{HELLO_WORLD_URL}/hello_world.elf",
 }
+SLEEP_TIME = int(os.getenv("WOKWI_SLEEP_TIME", "10"))
 
 
 async def main() -> None:
@@ -50,10 +51,10 @@ async def main() -> None:
         elf="hello_world.elf",
     )
 
-    # Stream serial output for 10 seconds
+    # Stream serial output for a few seconds
     serial_task = asyncio.create_task(client.serial_monitor_cat())
-    print("Simulation started, waiting for 10 seconds…")
-    await asyncio.sleep(10)
+    print(f"Simulation started, waiting for {SLEEP_TIME} seconds…")
+    await asyncio.sleep(SLEEP_TIME)
     serial_task.cancel()
 
     # Disconnect from the simulator

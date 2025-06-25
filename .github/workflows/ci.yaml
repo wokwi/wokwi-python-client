@@ -21,4 +21,8 @@ jobs:
             - run: hatch run ruff format --check .
             - run: hatch run ruff check .
             - run: hatch run mypy .
+            - name: Run a Wokwi CI server
+              uses: wokwi/wokwi-ci-server-action@v1
             - run: hatch run dev:pytest
+              env:
+                  WOKWI_CLI_TOKEN: ${{ secrets.WOKWI_CLI_TOKEN }}
