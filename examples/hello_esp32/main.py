@@ -54,7 +54,7 @@ async def main() -> None:
     # Stream serial output for a few seconds
     serial_task = asyncio.create_task(client.serial_monitor_cat())
     print(f"Simulation started, waiting for {SLEEP_TIME} seconds…")
-    await asyncio.sleep(SLEEP_TIME)
+    await client.wait_until_simulation_time(SLEEP_TIME)
     serial_task.cancel()
 
     # Disconnect from the simulator
