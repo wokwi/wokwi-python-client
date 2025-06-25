@@ -27,7 +27,7 @@ classifiers = [
     "Typing :: Typed",
     "License :: OSI Approved :: MIT License",
 ]
-dependencies = ["pydantic>=2.8"]
+dependencies = ["pydantic>=2.8", "websockets>=12,<13"]
 
 [project.urls]
 Documentation = "https://github.com/wokwi/wokwi-python-client#readme"
@@ -86,6 +86,7 @@ dependencies = [
     "pymdown-extensions",
     "mkdocs-material[extensions]",
     "mkdocstrings[python]",
+    "types-requests",
 ]
 
 [tool.hatch.envs.dev]

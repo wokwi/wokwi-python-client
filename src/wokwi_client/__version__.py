@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2025-present CodeMagic LTD
+#
+# SPDX-License-Identifier: MIT
+
 from importlib.metadata import PackageNotFoundError, version
 
 try:  # works for normal + editable installs
