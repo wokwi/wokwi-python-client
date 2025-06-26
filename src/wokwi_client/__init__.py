@@ -1,3 +1,11 @@
+"""
+Wokwi Python Client Library
+
+Typed, asyncio-friendly Python SDK for the Wokwi Simulation API.
+
+Provides the WokwiClient class for connecting to, controlling, and monitoring Wokwi simulations from Python.
+"""
+
 # SPDX-FileCopyrightText: 2025-present CodeMagic LTD
 #
 # SPDX-License-Identifier: MIT
