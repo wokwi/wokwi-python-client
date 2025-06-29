@@ -4,7 +4,7 @@ Typed, asyncio-friendly Python SDK for the **Wokwi Simulation API**
 
 [![PyPI version](https://img.shields.io/pypi/v/wokwi-client?logo=pypi)](https://pypi.org/project/wokwi-client/)
 [![Python versions](https://img.shields.io/pypi/pyversions/wokwi-client)](https://pypi.org/project/wokwi-client/)
-[![CI](https://github.com/wokwi/wokwi-python-client/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/wokwi/wokwi-python-client/actions/workflows/ci.yml)
+[![CI](https://github.com/wokwi/wokwi-python-client/actions/workflows/ci.yaml/badge.svg?branch=main)](https://github.com/wokwi/wokwi-python-client/actions/workflows/ci.yaml)
 [![License: MIT](https://img.shields.io/github/license/wokwi/wokwi-python-client)](LICENSE)
 
 > **TL;DR:** Run and control your Wokwi simulations from Python with first-class type hints and zero boilerplate.
