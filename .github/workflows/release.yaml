@@ -7,7 +7,7 @@ on:
 
 permissions:
     id-token: write # OIDC token for trusted publishing
-    contents: read
+    contents: write # For the release action
 
 jobs:
     build-and-publish:
