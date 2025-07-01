@@ -25,12 +25,6 @@ async def main() -> None:
             f"Set WOKWI_CLI_TOKEN in your environment. You can get it from {GET_TOKEN_URL}."
         )
 
-    client = WokwiClient(token)
-    print(f"Wokwi client library version: {client.version}")
-
-    hello = await client.connect()
-    print("Connected to Wokwi Simulator, server version:", hello["version"])
-
     for filename, url in FIRMWARE_FILES.items():
         if (EXAMPLE_DIR / filename).exists():
             continue
@@ -39,6 +33,12 @@ async def main() -> None:
         response.raise_for_status()
         with open(EXAMPLE_DIR / filename, "wb") as f:
             f.write(response.content)
+
+    client = WokwiClient(token)
+    print(f"Wokwi client library version: {client.version}")
+
+    hello = await client.connect()
+    print("Connected to Wokwi Simulator, server version:", hello["version"])
 
     # Upload the diagram and firmware files
     await client.upload_file("diagram.json", EXAMPLE_DIR / "diagram.json")
