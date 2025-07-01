@@ -95,6 +95,7 @@ dependencies = [
     "mkdocs-material[extensions]",
     "mkdocstrings[python]",
     "types-requests",
+    "littlefs-python>=0.14.0",
 ]
 
 [tool.hatch.envs.dev]
