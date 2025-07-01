@@ -55,7 +55,7 @@ if __name__ == "__main__":
     asyncio.run(main())
 ```
 
-See the [examples/hello_esp32/main.py](https://github.com/wokwi/wokwi-python-client/blob/main/examples/hello_esp32/main.py) for a full example including serial monitoring.
+See the [examples/hello_esp32/main.py](https://github.com/wokwi/wokwi-python-client/blob/main/examples/hello_esp32/main.py) for a full example including serial monitoring, and [examples/micropython_esp32/main.py](https://github.com/wokwi/wokwi-python-client/blob/main/examples/micropython_esp32/main.py) for an example of running MicroPython on a simulated ESP32 board.
 
 ## API Reference
 
