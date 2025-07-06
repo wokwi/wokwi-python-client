@@ -87,7 +87,7 @@ class WokwiClient:
     async def start_simulation(
         self,
         firmware: str,
-        elf: str,
+        elf: Optional[str] = None,
         pause: bool = False,
         chips: list[str] = [],
     ) -> ResponseMessage:
@@ -95,8 +95,9 @@ class WokwiClient:
         Start a new simulation with the given parameters.
 
         The firmware and ELF files must be uploaded to the simulator first using the
-        `upload()` or `upload_file()` methods. The firmware and ELF files are required
-        for the simulation to run.
+        `upload()` or `upload_file()` methods.
+        The firmware file is required for the simulation to run.
+        The ELF file is optional and can speed up the simulation in some cases.
 
         The optional `chips` parameter can be used to load custom chips into the simulation.
         For each custom chip, you need to upload two files:
@@ -109,7 +110,7 @@ class WokwiClient:
 
         Args:
             firmware: The firmware binary filename.
-            elf: The ELF file filename.
+            elf: The ELF file filename (optional).
             pause: Whether to start the simulation paused (default: False).
             chips: List of custom chips to load into the simulation (default: empty list).
 

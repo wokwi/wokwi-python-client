@@ -41,8 +41,7 @@ async def main():
     await client.connect()
     await client.upload_file("diagram.json")
     await client.upload_file("firmware.bin")
-    await client.upload_file("firmware.elf")
-    await client.start_simulation(firmware="firmware.bin", elf="firmware.elf")
+    await client.start_simulation(firmware="firmware.bin")
     serial_task = asyncio.create_task(
         client.serial_monitor_cat()
     )  # Stream serial output

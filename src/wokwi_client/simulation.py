@@ -12,7 +12,7 @@ async def start(
     transport: Transport,
     *,
     firmware: str,
-    elf: str,
+    elf: Optional[str] = None,
     pause: bool = False,
     chips: list[str] = [],
 ) -> ResponseMessage:

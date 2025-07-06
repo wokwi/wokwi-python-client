@@ -93,7 +93,7 @@ async def main() -> None:
     await client.upload(FIRMWARE_NAME, bytes(firmware_data))
 
     # Start the simulation
-    await client.start_simulation(firmware=FIRMWARE_NAME, elf=FIRMWARE_NAME)
+    await client.start_simulation(firmware=FIRMWARE_NAME)
 
     # Stream serial output for a few seconds
     serial_task = asyncio.create_task(client.serial_monitor_cat())
