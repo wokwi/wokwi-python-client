@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+import typing
 from pathlib import Path
 from typing import Any, Optional
 
@@ -181,7 +182,7 @@ class WokwiClient:
         async for line in monitor_lines(self._transport):
             print(line.decode("utf-8"), end="", flush=True)
 
-    async def serial_write(self, data: bytes | str | list[int]) -> None:
+    async def serial_write(self, data: typing.Union[bytes, str, list[int]]) -> None:
         """Write data to the simulation serial monitor interface."""
         await write_serial(self._transport, data)
 
@@ -210,7 +211,9 @@ class WokwiClient:
         """
         return await pin_listen(self._transport, part=part, pin=pin, listen=listen)
 
-    async def set_control(self, part: str, control: str, value: int | bool | float) -> ResponseMessage:
+    async def set_control(
+        self, part: str, control: str, value: typing.Union[int, bool, float]
+    ) -> ResponseMessage:
         """Set a control value (e.g. simulate button press).
 
         Args:

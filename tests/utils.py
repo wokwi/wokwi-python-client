@@ -11,9 +11,12 @@ import os
 import subprocess
 import sys
 from collections.abc import Mapping
+from subprocess import CompletedProcess
 
 
-def run_example_module(module: str, *, sleep_time: str = "1", extra_env: Mapping[str, str] | None = None) -> subprocess.CompletedProcess:
+def run_example_module(
+    module: str, *, sleep_time: str = "1", extra_env: Mapping[str, str] | None = None
+) -> CompletedProcess[str]:
     """Run an example module with a short simulation time.
 
     Requires WOKWI_CLI_TOKEN to be set in the environment.
