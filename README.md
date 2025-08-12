@@ -1,6 +1,6 @@
 # Wokwi Python Client 🚀
 
-Typed, asyncio-friendly Python SDK for the **Wokwi Simulation API**
+Typed Python SDK for the **Wokwi Simulation API**, with async and sync APIs
 
 [![PyPI version](https://img.shields.io/pypi/v/wokwi-client?logo=pypi)](https://pypi.org/project/wokwi-client/)
 [![Python versions](https://img.shields.io/pypi/pyversions/wokwi-client)](https://pypi.org/project/wokwi-client/)

@@ -2,25 +2,18 @@
 #
 # SPDX-License-Identifier: MIT
 
-import os
-import subprocess
-import sys
+from .utils import run_example_module
 
 
 def test_hello_esp32_example() -> None:
-    """`python -m examples.hello_esp32.main` runs the hello_esp32 example and exits with 0."""
+    """Async hello_esp32 example should run and exit with 0."""
+    result = run_example_module("examples.hello_esp32.main")
+    assert result.returncode == 0
+    assert "main_task: Calling app_main()" in result.stdout
 
-    assert os.environ.get("WOKWI_CLI_TOKEN") is not None, (
-        "WOKWI_CLI_TOKEN environment variable is not set. You can get it from https://wokwi.com/dashboard/ci."
-    )
 
-    result = subprocess.run(
-        [sys.executable, "-m", "examples.hello_esp32.main"],
-        check=False,
-        capture_output=True,
-        text=True,
-        env={**os.environ, "WOKWI_SLEEP_TIME": "1"},
-    )
-
+def test_hello_esp32_sync_example() -> None:
+    """Sync hello_esp32 example should run and exit with 0."""
+    result = run_example_module("examples.hello_esp32_sync.main")
     assert result.returncode == 0
     assert "main_task: Calling app_main()" in result.stdout

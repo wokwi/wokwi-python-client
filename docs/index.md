@@ -1,6 +1,6 @@
 # Wokwi Python Client Library
 
-Typed, asyncio-friendly Python SDK for the **Wokwi Simulation API**.
+Typed Python SDK for the **Wokwi Simulation API**, with async and sync APIs.
 
 ## Features
 
@@ -10,6 +10,7 @@ Typed, asyncio-friendly Python SDK for the **Wokwi Simulation API**.
 - Monitor serial output asynchronously and write to them
 - Control peripherals and read GPIO pins
 - Fully type-annotated and easy to use with asyncio
+- Async and sync APIs
 
 ## Installation
 
@@ -25,37 +26,74 @@ Get your API token from [https://wokwi.com/dashboard/ci](https://wokwi.com/dashb
 
 ## Quickstart Example
 
-```python
-import asyncio
-import os
-from wokwi_client import WokwiClient, GET_TOKEN_URL
+=== "Async (recommended)"
+
+    ```python
+    import asyncio
+    import os
+    from wokwi_client import WokwiClient, GET_TOKEN_URL
 
 
-async def main():
-    token = os.getenv("WOKWI_CLI_TOKEN")
-    if not token:
-        raise SystemExit(
-            f"Set WOKWI_CLI_TOKEN in your environment. You can get it from {GET_TOKEN_URL}."
-        )
+    async def main():
+        token = os.getenv("WOKWI_CLI_TOKEN")
+        if not token:
+            raise SystemExit(
+                f"Set WOKWI_CLI_TOKEN in your environment. You can get it from {GET_TOKEN_URL}."
+            )
 
-    client = WokwiClient(token)
-    await client.connect()
-    await client.upload_file("diagram.json")
-    await client.upload_file("firmware.bin")
-    await client.start_simulation(firmware="firmware.bin")
-    serial_task = asyncio.create_task(
-        client.serial_monitor_cat()
-    )  # Stream serial output
-    await client.wait_until_simulation_time(10)  # Run simulation for 10 seconds
-    serial_task.cancel()
-    await client.disconnect()
+        client = WokwiClient(token)
+        await client.connect()
+        await client.upload_file("diagram.json")
+        await client.upload_file("firmware.bin")
+        await client.start_simulation(firmware="firmware.bin")
+
+        serial_task = asyncio.create_task(
+            client.serial_monitor_cat()
+        )  # Stream serial output
+        await client.wait_until_simulation_time(10)  # Run simulation for 10 seconds
+        serial_task.cancel()
+        await client.disconnect()
 
 
-if __name__ == "__main__":
-    asyncio.run(main())
-```
+    if __name__ == "__main__":
+        asyncio.run(main())
+    ```
 
-See the [examples/hello_esp32/main.py](https://github.com/wokwi/wokwi-python-client/blob/main/examples/hello_esp32/main.py) for a full example including serial monitoring, and [examples/micropython_esp32/main.py](https://github.com/wokwi/wokwi-python-client/blob/main/examples/micropython_esp32/main.py) for an example of running MicroPython on a simulated ESP32 board.
+=== "Sync"
+
+    ```python
+    import os
+    from wokwi_client import WokwiClientSync, GET_TOKEN_URL
+
+
+    def main():
+        token = os.getenv("WOKWI_CLI_TOKEN")
+        if not token:
+            raise SystemExit(
+                f"Set WOKWI_CLI_TOKEN in your environment. You can get it from {GET_TOKEN_URL}."
+            )
+
+        client = WokwiClientSync(token)
+        client.connect()
+        client.upload_file("diagram.json")
+        client.upload_file("firmware.bin")
+        client.start_simulation(firmware="firmware.bin")
+
+        # Stream serial output concurrently for 10 seconds
+        client.monitor_serial(lambda line: print(line.decode("utf-8"), end="", flush=True))
+        client.wait_until_simulation_time(10)
+        client.disconnect()
+
+
+    if __name__ == "__main__":
+        main()
+    ```
+
+## Examples
+
+- [examples/hello_esp32/main.py](https://github.com/wokwi/wokwi-python-client/blob/main/examples/hello_esp32/main.py) full async example including serial monitoring
+- [examples/hello_esp32_sync/main.py](https://github.com/wokwi/wokwi-python-client/blob/main/examples/hello_esp32_sync/main.py) sync wrapper usage
+- [examples/micropython_esp32/main.py](https://github.com/wokwi/wokwi-python-client/blob/main/examples/micropython_esp32/main.py) example of running MicroPython on a simulated ESP32 board.
 
 ## API Reference
 
