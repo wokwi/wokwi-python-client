@@ -12,7 +12,7 @@ from .event_queue import EventQueue
 from .file_ops import upload, upload_file
 from .pins import pin_listen, pin_read
 from .protocol_types import EventMessage, ResponseMessage
-from .serial import monitor_lines
+from .serial import monitor_lines, write_serial
 from .simulation import pause, restart, resume, start
 from .transport import Transport
 
@@ -180,6 +180,10 @@ class WokwiClient:
         """
         async for line in monitor_lines(self._transport):
             print(line.decode("utf-8"), end="", flush=True)
+
+    async def serial_write(self, data: bytes | str | list[int]) -> None:
+        """Write data to the simulation serial monitor interface."""
+        await write_serial(self._transport, data)
 
     def _on_pause(self, event: EventMessage) -> None:
         self.last_pause_nanos = int(event["nanos"])
