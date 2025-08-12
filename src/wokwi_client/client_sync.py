@@ -15,21 +15,21 @@ from wokwi_client import WokwiClient
 from wokwi_client.serial import monitor_lines as monitor_serial_lines
 
 if t.TYPE_CHECKING:
-    from collections.abc import Iterable
+    pass
 
 
 class WokwiClientSync:
     """Synchronous wrapper around the async WokwiClient."""
 
     token: str
-    server: t.Optional[str]
-    _loop: t.Optional[asyncio.AbstractEventLoop]
-    _loop_thread: t.Optional[threading.Thread]
-    _client: t.Optional[WokwiClient]
-    _monitor_task: t.Optional[Future[t.Any]]
+    server: str | None
+    _loop: asyncio.AbstractEventLoop | None
+    _loop_thread: threading.Thread | None
+    _client: WokwiClient | None
+    _monitor_task: Future[t.Any] | None
     _connected: bool
 
-    def __init__(self, token: str, server: t.Optional[str] = None) -> None:
+    def __init__(self, token: str, server: str | None = None) -> None:
         self.token = token
         self.server = server
         self._loop = None
@@ -50,10 +50,12 @@ class WokwiClientSync:
         future = asyncio.run_coroutine_threadsafe(coro, self._loop)
         return future.result(timeout=timeout)
 
-    def connect(self) -> t.Dict[str, t.Any]:
+    def connect(self) -> dict[str, t.Any]:
         if not self._connected:
             self._client = WokwiClient(self.token, self.server)
-            result: t.Dict[str, t.Any] = t.cast(t.Dict[str, t.Any], self._run_async(self._client.connect()))
+            result: dict[str, t.Any] = t.cast(
+                dict[str, t.Any], self._run_async(self._client.connect())
+            )
             self._connected = True
             return result
         return {}
@@ -85,7 +87,7 @@ class WokwiClientSync:
         assert self._client is not None
         return self._run_async(self._client.upload(name, content))
 
-    def upload_file(self, filename: str, local_path: t.Optional[Path] = None) -> t.Any:
+    def upload_file(self, filename: str, local_path: Path | None = None) -> t.Any:
         if not self._connected:
             raise RuntimeError("Client not connected")
         assert self._client is not None
@@ -94,9 +96,9 @@ class WokwiClientSync:
     def start_simulation(
         self,
         firmware: str,
-        elf: t.Optional[str] = None,
+        elf: str | None = None,
         pause: bool = False,
-        chips: t.Optional[t.List[str]] = None,
+        chips: list[str] | None = None,
     ) -> t.Any:
         if not self._connected:
             raise RuntimeError("Client not connected")
@@ -109,7 +111,7 @@ class WokwiClientSync:
         assert self._client is not None
         return self._run_async(self._client.pause_simulation())
 
-    def resume_simulation(self, pause_after: t.Optional[int] = None) -> t.Any:
+    def resume_simulation(self, pause_after: int | None = None) -> t.Any:
         if not self._connected:
             raise RuntimeError("Client not connected")
         assert self._client is not None
@@ -133,7 +135,7 @@ class WokwiClientSync:
         assert self._client is not None
         return self._run_async(self._client.serial_monitor_cat())
 
-    def write_serial(self, data: t.Union[bytes, str, t.List[int]]) -> t.Any:
+    def write_serial(self, data: bytes | str | list[int]) -> t.Any:
         if not self._connected:
             raise RuntimeError("Client not connected")
         assert self._client is not None
@@ -172,7 +174,7 @@ class WokwiClientSync:
         assert self._loop is not None
         self._monitor_task = asyncio.run_coroutine_threadsafe(_monitor(), self._loop)
 
-    def set_control(self, part: str, control: str, value: t.Union[int, bool, float]) -> t.Any:
+    def set_control(self, part: str, control: str, value: int | bool | float) -> t.Any:
         if not self._connected:
             raise RuntimeError("Client not connected")
         assert self._client is not None
