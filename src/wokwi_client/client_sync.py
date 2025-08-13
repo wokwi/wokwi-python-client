@@ -93,6 +93,18 @@ class WokwiClientSync:
         assert self._client is not None
         return self._run_async(self._client.upload_file(filename, local_path))
 
+    def download(self, name: str) -> t.Any:
+        if not self._connected:
+            raise RuntimeError("Client not connected")
+        assert self._client is not None
+        return self._run_async(self._client.download(name))
+
+    def download_file(self, name: str, local_path: Path | None = None) -> t.Any:
+        if not self._connected:
+            raise RuntimeError("Client not connected")
+        assert self._client is not None
+        return self._run_async(self._client.download_file(name, local_path))
+
     def start_simulation(
         self,
         firmware: str,
@@ -152,6 +164,12 @@ class WokwiClientSync:
             raise RuntimeError("Client not connected")
         assert self._client is not None
         return self._run_async(self._client.listen_pin(part, pin, listen))
+
+    def gpio_list(self) -> t.Any:
+        if not self._connected:
+            raise RuntimeError("Client not connected")
+        assert self._client is not None
+        return self._run_async(self._client.gpio_list())
 
     def monitor_serial(self, callback: t.Callable[[bytes], None]) -> None:
         if not self._connected:

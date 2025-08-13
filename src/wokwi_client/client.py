@@ -10,8 +10,8 @@ from .__version__ import get_version
 from .constants import DEFAULT_WS_URL
 from .control import set_control
 from .event_queue import EventQueue
-from .file_ops import upload, upload_file
-from .pins import pin_listen, pin_read
+from .file_ops import download, download_file, upload, upload_file
+from .pins import gpio_list, pin_listen, pin_read
 from .protocol_types import EventMessage, ResponseMessage
 from .serial import monitor_lines, write_serial
 from .simulation import pause, restart, resume, start
@@ -87,6 +87,28 @@ class WokwiClient:
             The response message from the server.
         """
         return await upload_file(self._transport, filename, local_path)
+
+    async def download(self, name: str) -> ResponseMessage:
+        """
+        Download a file from the simulator.
+
+        Args:
+            name: The name of the file to download.
+
+        Returns:
+            The response message from the server.
+        """
+        return await download(self._transport, name)
+
+    async def download_file(self, name: str, local_path: Optional[Path] = None) -> None:
+        """
+        Download a file from the simulator and save it to a local path.
+
+        Args:
+            name: The name of the file to download.
+            local_path: The local path to save the downloaded file. If not provided, uses the name as the path.
+        """
+        await download_file(self._transport, name, local_path)
 
     async def start_simulation(
         self,
@@ -213,6 +235,10 @@ class WokwiClient:
             listen: True to start listening, False to stop.
         """
         return await pin_listen(self._transport, part=part, pin=pin, listen=listen)
+
+    async def gpio_list(self) -> ResponseMessage:
+        """Get a list of all GPIO pins available in the simulation."""
+        return await gpio_list(self._transport)
 
     async def set_control(
         self, part: str, control: str, value: typing.Union[int, bool, float]

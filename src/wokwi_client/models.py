@@ -10,6 +10,10 @@ class UploadParams(BaseModel):
     binary: str  # base64
 
 
+class DownloadParams(BaseModel):
+    binary: str  # base64
+
+
 class SimulationParams(BaseModel):
     firmware: str
     elf: str
