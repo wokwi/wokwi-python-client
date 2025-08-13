@@ -6,6 +6,13 @@ import typing
 from pathlib import Path
 from typing import Any, Optional
 
+from wokwi_client.framebuffer import (
+    compare_framebuffer_png,
+    framebuffer_png_bytes,
+    framebuffer_read,
+    save_framebuffer_png,
+)
+
 from .__version__ import get_version
 from .constants import DEFAULT_WS_URL
 from .control import set_control
@@ -251,3 +258,23 @@ class WokwiClient:
             value: Control value to set (float).
         """
         return await set_control(self._transport, part=part, control=control, value=value)
+
+    async def framebuffer_read(self, id: str) -> ResponseMessage:
+        """Read the current framebuffer for the given device id."""
+        return await framebuffer_read(self._transport, id=id)
+
+    async def framebuffer_png_bytes(self, id: str) -> bytes:
+        """Return the current framebuffer as PNG bytes."""
+        return await framebuffer_png_bytes(self._transport, id=id)
+
+    async def save_framebuffer_png(self, id: str, path: Path, overwrite: bool = True) -> Path:
+        """Save the current framebuffer as a PNG file."""
+        return await save_framebuffer_png(self._transport, id=id, path=path, overwrite=overwrite)
+
+    async def compare_framebuffer_png(
+        self, id: str, reference: Path, save_mismatch: Optional[Path] = None
+    ) -> bool:
+        """Compare the current framebuffer with a reference PNG file."""
+        return await compare_framebuffer_png(
+            self._transport, id=id, reference=reference, save_mismatch=save_mismatch
+        )

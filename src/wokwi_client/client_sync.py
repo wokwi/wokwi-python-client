@@ -198,6 +198,41 @@ class WokwiClientSync:
         assert self._client is not None
         return self._run_async(self._client.set_control(part, control, value))
 
+    def framebuffer_read(self, id: str) -> t.Any:
+        """Read the current framebuffer for the given device id."""
+        if not self._connected:
+            raise RuntimeError("Client not connected")
+        assert self._client is not None
+        return self._run_async(self._client.framebuffer_read(id))
+
+    def framebuffer_png_bytes(self, id: str) -> bytes:
+        """Return the current framebuffer as PNG bytes."""
+        if not self._connected:
+            raise RuntimeError("Client not connected")
+        assert self._client is not None
+        return t.cast(bytes, self._run_async(self._client.framebuffer_png_bytes(id)))
+
+    def save_framebuffer_png(self, id: str, path: Path, overwrite: bool = True) -> Path:
+        """Save the current framebuffer as a PNG file."""
+        if not self._connected:
+            raise RuntimeError("Client not connected")
+        assert self._client is not None
+        return t.cast(
+            Path, self._run_async(self._client.save_framebuffer_png(id, path, overwrite=overwrite))
+        )
+
+    def compare_framebuffer_png(
+        self, id: str, reference: Path, save_mismatch: Path | None = None
+    ) -> bool:
+        """Compare the current framebuffer with a reference PNG file."""
+        if not self._connected:
+            raise RuntimeError("Client not connected")
+        assert self._client is not None
+        return t.cast(
+            bool,
+            self._run_async(self._client.compare_framebuffer_png(id, reference, save_mismatch)),
+        )
+
     @property
     def version(self) -> str:
         if self._client:
