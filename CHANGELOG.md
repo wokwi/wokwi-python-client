@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.5 - 2025-08-15
+
+- feat: enhance serial monitor functionality with UTF-8 decoding options (#3)
+
 ## 0.0.4 - 2025-07-06
 
 - feat: make `elf` parameter optional in `start_simulation()`
