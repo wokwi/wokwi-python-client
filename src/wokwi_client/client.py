@@ -172,12 +172,24 @@ class WokwiClient:
         """
         return await restart(self._transport, pause)
 
-    async def serial_monitor_cat(self) -> None:
+    async def serial_monitor_cat(self, decode_utf8: bool = True, errors: str = "replace") -> None:
         """
         Print serial monitor output to stdout as it is received from the simulation.
+
+        Args:
+            decode_utf8: Whether to decode bytes as UTF-8. If False, prints raw bytes (default: True).
+            errors: How to handle UTF-8 decoding errors. Options: 'strict', 'ignore', 'replace' (default: 'replace').
         """
         async for line in monitor_lines(self._transport):
-            print(line.decode("utf-8"), end="", flush=True)
+            if decode_utf8:
+                try:
+                    output = line.decode("utf-8", errors=errors)
+                    print(output, end="", flush=True)
+                except UnicodeDecodeError:
+                    # Fallback to raw bytes if decoding fails completely
+                    print(line, end="", flush=True)
+            else:
+                print(line, end="", flush=True)
 
     def _on_pause(self, event: EventMessage) -> None:
         self.last_pause_nanos = int(event["nanos"])
