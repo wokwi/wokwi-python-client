@@ -47,6 +47,27 @@ For more examples, see the [examples](examples) directory.
 
 The API documentation is available at [https://wokwi.github.io/wokwi-python-client/](https://wokwi.github.io/wokwi-python-client/).
 
+## Development
+
+To run the tests, set the `WOKWI_CLI_TOKEN` environment variable (you can get a token from [https://wokwi.com/dashboard/ci](https://wokwi.com/dashboard/ci)) and run the following command:
+
+```bash
+hatch run dev:pytest
+```
+
+To run the linter, run the following command:
+
+```bash
+hatch run ruff format --check .
+hatch run ruff check .
+```
+
+To run the type checker, run the following command:
+
+```bash
+hatch run mypy .
+```
+
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
