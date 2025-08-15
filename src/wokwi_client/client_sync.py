@@ -141,11 +141,13 @@ class WokwiClientSync:
         assert self._client is not None
         return self._run_async(self._client.restart_simulation(pause))
 
-    def serial_monitor_cat(self) -> t.Any:
+    def serial_monitor_cat(self, decode_utf8: bool = True, errors: str = "replace") -> t.Any:
         if not self._connected:
             raise RuntimeError("Client not connected")
         assert self._client is not None
-        return self._run_async(self._client.serial_monitor_cat())
+        return self._run_async(
+            self._client.serial_monitor_cat(decode_utf8=decode_utf8, errors=errors)
+        )
 
     def write_serial(self, data: bytes | str | list[int]) -> t.Any:
         if not self._connected:
