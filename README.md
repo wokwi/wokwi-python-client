@@ -68,6 +68,18 @@ To run the type checker, run the following command:
 hatch run mypy .
 ```
 
+### Creating a new release
+
+To create a new release, run the following commands:
+
+```bash
+git tag -m "v0.0.6" v0.0.6
+git push --follow-tags
+```
+
+Replace `0.0.6` with the new version number.
+
+
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
