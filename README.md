@@ -32,9 +32,7 @@ The basic example is in the [examples/hello_esp32/main.py](examples/hello_esp32/
 - Connect to the Wokwi Simulator
 - Upload a diagram and firmware files
 - Start a simulation
-- Monitor the serial output and write to them
-- Read GPIO pins
-- Control peripherals (buttons, MPU6050, etc.)
+- Monitor serial output asynchronously
 
 You can run the example with:
 

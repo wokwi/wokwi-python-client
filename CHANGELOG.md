@@ -2,9 +2,7 @@
 
 ## 0.0.6 - 2025-08-17
 
-- feat: add `set_control()` method
-- feat: add `read_pin()`, `listen_pin()` methods
-- feat: add `serial_write()`, `serial_monitor_cat()` methods
+- feat: add `set_control()`, `read_pin()`, `listen_pin()`, `serial_write()` methods (#1)
 
 ## 0.0.5 - 2025-08-15
 
