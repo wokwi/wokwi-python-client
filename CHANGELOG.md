@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.0.6 - 2025-08-17
+
+- feat: add `set_control()` method
+- feat: add `read_pin()`, `listen_pin()` methods
+- feat: add `serial_write()`, `serial_monitor_cat()` methods
+
 ## 0.0.5 - 2025-08-15
 
 - feat: enhance serial monitor functionality with UTF-8 decoding options (#3)
