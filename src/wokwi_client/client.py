@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any, Optional, Union
 
 from .__version__ import get_version
 from .constants import DEFAULT_WS_URL
@@ -193,7 +193,7 @@ class WokwiClient:
             else:
                 print(line, end="", flush=True)
 
-    async def serial_write(self, data: bytes | str | list[int]) -> None:
+    async def serial_write(self, data: Union[bytes, str, list[int]]) -> None:
         """Write data to the simulation serial monitor interface."""
         await write_serial(self._transport, data)
 
@@ -222,7 +222,9 @@ class WokwiClient:
         """
         return await pin_listen(self._transport, part=part, pin=pin, listen=listen)
 
-    async def set_control(self, part: str, control: str, value: int | bool | float) -> ResponseMessage:
+    async def set_control(
+        self, part: str, control: str, value: Union[int, bool, float]
+    ) -> ResponseMessage:
         """Set a control value (e.g. simulate button press).
 
         Args:

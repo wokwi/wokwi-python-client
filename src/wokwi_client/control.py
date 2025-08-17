@@ -11,12 +11,14 @@ Assumptions:
 #
 # SPDX-License-Identifier: MIT
 
+from typing import Union
+
 from .protocol_types import ResponseMessage
 from .transport import Transport
 
 
 async def set_control(
-    transport: Transport, *, part: str, control: str, value: int | bool | float
+    transport: Transport, *, part: str, control: str, value: Union[int, bool, float]
 ) -> ResponseMessage:
     """Set a control value on a part (e.g. simulate button press/release).
 

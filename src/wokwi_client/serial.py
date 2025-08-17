@@ -2,7 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
-from collections.abc import AsyncGenerator, Iterable
+from collections.abc import AsyncGenerator
+from typing import Union
 
 from .event_queue import EventQueue
 from .transport import Transport
@@ -16,7 +17,7 @@ async def monitor_lines(transport: Transport) -> AsyncGenerator[bytes, None]:
             yield bytes(event_msg["payload"]["bytes"])
 
 
-async def write_serial(transport: Transport, data: bytes | str | Iterable[int]) -> None:
+async def write_serial(transport: Transport, data: Union[bytes, str, list[int]]) -> None:
     """Write data to the serial monitor.
 
     Accepts bytes, str (encoded as utf-8), or an iterable of integer byte values.

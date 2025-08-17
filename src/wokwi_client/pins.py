@@ -15,9 +15,7 @@ from .protocol_types import ResponseMessage
 from .transport import Transport
 
 
-async def pin_read(
-    transport: Transport, *, part: str, pin: str
-) -> ResponseMessage:
+async def pin_read(transport: Transport, *, part: str, pin: str) -> ResponseMessage:
     """Read the state of a pin.
 
     Args:
@@ -44,6 +42,4 @@ async def pin_listen(
         listen: True to start listening, False to stop.
     """
 
-    return await transport.request(
-        "pin:listen", {"part": part, "pin": pin, "listen": listen}
-    )
+    return await transport.request("pin:listen", {"part": part, "pin": pin, "listen": listen})
