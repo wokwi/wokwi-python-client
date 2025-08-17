@@ -7,7 +7,8 @@ Typed, asyncio-friendly Python SDK for the **Wokwi Simulation API**.
 - Connect to the Wokwi Simulator from Python
 - Upload diagrams and firmware files
 - Start, pause, resume, and restart simulations
-- Monitor serial output asynchronously
+- Monitor serial output asynchronously and write to them
+- Control peripherals and read GPIO pins
 - Fully type-annotated and easy to use with asyncio
 
 ## Installation

@@ -1,0 +1,49 @@
+"""Pin command helpers for the Wokwi Simulation API.
+
+This module exposes helper coroutines for issuing pin-related commands:
+
+* pin:read   - Read the current state of a pin.
+* pin:listen - Start/stop listening for changes on a pin (emits pin:change
+    events).
+"""
+
+# SPDX-FileCopyrightText: 2025-present CodeMagic LTD
+#
+# SPDX-License-Identifier: MIT
+
+from .protocol_types import ResponseMessage
+from .transport import Transport
+
+
+async def pin_read(
+    transport: Transport, *, part: str, pin: str
+) -> ResponseMessage:
+    """Read the state of a pin.
+
+    Args:
+        transport: The active Transport instance.
+        part: Part identifier (e.g. "uno").
+        pin: Pin name (e.g. "A2", "13").
+    """
+
+    return await transport.request("pin:read", {"part": part, "pin": pin})
+
+
+async def pin_listen(
+    transport: Transport, *, part: str, pin: str, listen: bool = True
+) -> ResponseMessage:
+    """Enable or disable listening for changes on a pin.
+
+    When listening is enabled, "pin:change" events will be emitted with the
+    pin state.
+
+    Args:
+        transport: The active Transport instance.
+        part: Part identifier.
+        pin: Pin name.
+        listen: True to start listening, False to stop.
+    """
+
+    return await transport.request(
+        "pin:listen", {"part": part, "pin": pin, "listen": listen}
+    )
