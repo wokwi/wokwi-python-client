@@ -22,3 +22,7 @@ async def upload_file(
 async def upload(transport: Transport, name: str, content: bytes) -> ResponseMessage:
     params = UploadParams(name=name, binary=base64.b64encode(content).decode())
     return await transport.request("file:upload", params.model_dump())
+
+
+async def download(transport: Transport, name: str) -> ResponseMessage:
+    return await transport.request("file:download", {"name": name})
