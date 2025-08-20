@@ -2,13 +2,12 @@
 #
 # SPDX-License-Identifier: MIT
 
+import base64
 from pathlib import Path
 from typing import Any, Optional, Union
 
 from wokwi_client.framebuffer import (
-    compare_framebuffer_png,
-    framebuffer_png_bytes,
-    framebuffer_read,
+    read_framebuffer_png_bytes,
     save_framebuffer_png,
 )
 
@@ -16,7 +15,7 @@ from .__version__ import get_version
 from .constants import DEFAULT_WS_URL
 from .control import set_control
 from .event_queue import EventQueue
-from .file_ops import download, download_file, upload, upload_file
+from .file_ops import download, upload, upload_file
 from .pins import gpio_list, pin_listen, pin_read
 from .protocol_types import EventMessage, ResponseMessage
 from .serial import monitor_lines, write_serial
@@ -93,7 +92,7 @@ class WokwiClient:
         """
         return await upload_file(self._transport, filename, local_path)
 
-    async def download(self, name: str) -> ResponseMessage:
+    async def download(self, name: str) -> bytes:
         """
         Download a file from the simulator.
 
@@ -101,9 +100,10 @@ class WokwiClient:
             name: The name of the file to download.
 
         Returns:
-            The response message from the server.
+            The downloaded file content as bytes.
         """
-        return await download(self._transport, name)
+        result = await download(self._transport, name)
+        return base64.b64decode(result["result"]["binary"])
 
     async def download_file(self, name: str, local_path: Optional[Path] = None) -> None:
         """
@@ -113,7 +113,12 @@ class WokwiClient:
             name: The name of the file to download.
             local_path: The local path to save the downloaded file. If not provided, uses the name as the path.
         """
-        await download_file(self._transport, name, local_path)
+        if local_path is None:
+            local_path = Path(name)
+
+        result = await self.download(name)
+        with open(local_path, "wb") as f:
+            f.write(result)
 
     async def start_simulation(
         self,
@@ -267,22 +272,10 @@ class WokwiClient:
         """
         return await set_control(self._transport, part=part, control=control, value=value)
 
-    async def framebuffer_read(self, id: str) -> ResponseMessage:
-        """Read the current framebuffer for the given device id."""
-        return await framebuffer_read(self._transport, id=id)
-
-    async def framebuffer_png_bytes(self, id: str) -> bytes:
+    async def read_framebuffer_png_bytes(self, id: str) -> bytes:
         """Return the current framebuffer as PNG bytes."""
-        return await framebuffer_png_bytes(self._transport, id=id)
+        return await read_framebuffer_png_bytes(self._transport, id=id)
 
     async def save_framebuffer_png(self, id: str, path: Path, overwrite: bool = True) -> Path:
         """Save the current framebuffer as a PNG file."""
         return await save_framebuffer_png(self._transport, id=id, path=path, overwrite=overwrite)
-
-    async def compare_framebuffer_png(
-        self, id: str, reference: Path, save_mismatch: Optional[Path] = None
-    ) -> bool:
-        """Compare the current framebuffer with a reference PNG file."""
-        return await compare_framebuffer_png(
-            self._transport, id=id, reference=reference, save_mismatch=save_mismatch
-        )
