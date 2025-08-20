@@ -5,6 +5,11 @@
 from pathlib import Path
 from typing import Any, Optional, Union
 
+from wokwi_client.framebuffer import (
+    read_framebuffer_png_bytes,
+    save_framebuffer_png,
+)
+
 from .__version__ import get_version
 from .constants import DEFAULT_WS_URL
 from .control import set_control
@@ -233,3 +238,11 @@ class WokwiClient:
             value: Control value to set (float).
         """
         return await set_control(self._transport, part=part, control=control, value=value)
+
+    async def read_framebuffer_png_bytes(self, id: str) -> bytes:
+        """Return the current framebuffer as PNG bytes."""
+        return await read_framebuffer_png_bytes(self._transport, id=id)
+
+    async def save_framebuffer_png(self, id: str, path: Path, overwrite: bool = True) -> Path:
+        """Save the current framebuffer as a PNG file."""
+        return await save_framebuffer_png(self._transport, id=id, path=path, overwrite=overwrite)
