@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.7 - 2025-08-20
+
+- feat: add `read_framebuffer_png_bytes()` and `save_framebuffer_png()` methods (#4)
+
 ## 0.0.6 - 2025-08-17
 
 - feat: add `set_control()`, `read_pin()`, `listen_pin()`, `serial_write()` methods (#1)
