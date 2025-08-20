@@ -3,8 +3,9 @@
 # SPDX-License-Identifier: MIT
 
 from pathlib import Path
-from typing import Any, Optional, Union
+from typing import Any, Optional, Union, cast
 
+from wokwi_client.exceptions import ProtocolError
 from wokwi_client.framebuffer import (
     compare_framebuffer_png,
     framebuffer_png_bytes,
@@ -251,9 +252,17 @@ class WokwiClient:
         """
         return await pin_listen(self._transport, part=part, pin=pin, listen=listen)
 
-    async def gpio_list(self) -> ResponseMessage:
-        """Get a list of all GPIO pins available in the simulation."""
-        return await gpio_list(self._transport)
+    async def gpio_list(self) -> list[str]:
+        """Get a list of all GPIO pins available in the simulation.
+
+        Returns:
+            list[str]: Example: ["esp32:GPIO0", "esp32:GPIO1", ...]
+        """
+        resp = await gpio_list(self._transport)
+        pins_val: Any = resp.get("result", {}).get("pins")
+        if not isinstance(pins_val, list) or not all(isinstance(p, str) for p in pins_val):
+            raise ProtocolError("Malformed gpio:list response: expected result.pins: list[str]")
+        return cast(list[str], pins_val)
 
     async def set_control(
         self, part: str, control: str, value: Union[int, bool, float]
