@@ -24,14 +24,13 @@ from .protocol_types import ResponseMessage
 from .transport import Transport
 
 __all__ = [
-    "framebuffer_read",
-    "framebuffer_png_bytes",
+    "read_framebuffer",
+    "read_framebuffer_png_bytes",
     "save_framebuffer_png",
-    "compare_framebuffer_png",
 ]
 
 
-async def framebuffer_read(transport: Transport, *, id: str) -> ResponseMessage:
+async def read_framebuffer(transport: Transport, *, id: str) -> ResponseMessage:
     """Issue `framebuffer:read` for the given device id and return raw response."""
     return await transport.request("framebuffer:read", {"id": id})
 
@@ -44,9 +43,9 @@ def _extract_png_b64(resp: ResponseMessage) -> str:
     return png_b64
 
 
-async def framebuffer_png_bytes(transport: Transport, *, id: str) -> bytes:
+async def read_framebuffer_png_bytes(transport: Transport, *, id: str) -> bytes:
     """Return decoded PNG bytes for the framebuffer of device `id`."""
-    resp = await framebuffer_read(transport, id=id)
+    resp = await read_framebuffer(transport, id=id)
     return base64.b64decode(_extract_png_b64(resp))
 
 
@@ -64,30 +63,8 @@ async def save_framebuffer_png(
     """
     if path.exists() and not overwrite:
         raise WokwiError(f"File already exists and overwrite=False: {path}")
-    data = await framebuffer_png_bytes(transport, id=id)
+    data = await read_framebuffer_png_bytes(transport, id=id)
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "wb") as f:
         f.write(data)
     return path
-
-
-async def compare_framebuffer_png(
-    transport: Transport, *, id: str, reference: Path, save_mismatch: Path | None = None
-) -> bool:
-    """Compare the current framebuffer PNG with a reference file.
-
-    Performs a byte-for-byte comparison. If different and `save_mismatch` is
-    provided, writes the current framebuffer PNG there.
-
-    Returns True if identical, False otherwise.
-    """
-    if not reference.exists():
-        raise WokwiError(f"Reference image does not exist: {reference}")
-    current = await framebuffer_png_bytes(transport, id=id)
-    ref_bytes = reference.read_bytes()
-    if current == ref_bytes:
-        return True
-    if save_mismatch:
-        save_mismatch.parent.mkdir(parents=True, exist_ok=True)
-        save_mismatch.write_bytes(current)
-    return False
