@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.8 - 2025-08-20
+
+- feat: add `download()` and `download_file()` methods (#5)
+
 ## 0.0.7 - 2025-08-20
 
 - feat: add `read_framebuffer_png_bytes()` and `save_framebuffer_png()` methods (#4)
