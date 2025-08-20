@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+import base64
 from pathlib import Path
 from typing import Any, Optional, Union
 
@@ -16,7 +17,7 @@ from .__version__ import get_version
 from .constants import DEFAULT_WS_URL
 from .control import set_control
 from .event_queue import EventQueue
-from .file_ops import download, download_file, upload, upload_file
+from .file_ops import download, upload, upload_file
 from .pins import pin_listen, pin_read
 from .protocol_types import EventMessage, ResponseMessage
 from .serial import monitor_lines, write_serial
@@ -93,7 +94,7 @@ class WokwiClient:
         """
         return await upload_file(self._transport, filename, local_path)
 
-    async def download(self, name: str) -> ResponseMessage:
+    async def download(self, name: str) -> bytes:
         """
         Download a file from the simulator.
 
@@ -101,9 +102,10 @@ class WokwiClient:
             name: The name of the file to download.
 
         Returns:
-            The response message from the server.
+            The downloaded file content as bytes.
         """
-        return await download(self._transport, name)
+        result = await download(self._transport, name)
+        return base64.b64decode(result["result"]["binary"])
 
     async def download_file(self, name: str, local_path: Optional[Path] = None) -> None:
         """
@@ -113,7 +115,12 @@ class WokwiClient:
             name: The name of the file to download.
             local_path: The local path to save the downloaded file. If not provided, uses the name as the path.
         """
-        await download_file(self._transport, name, local_path)
+        if local_path is None:
+            local_path = Path(name)
+
+        result = await self.download(name)
+        with open(local_path, "wb") as f:
+            f.write(result)
 
     async def start_simulation(
         self,
