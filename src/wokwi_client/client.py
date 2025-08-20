@@ -17,7 +17,7 @@ from .constants import DEFAULT_WS_URL
 from .control import set_control
 from .event_queue import EventQueue
 from .file_ops import download, download_file, upload, upload_file
-from .pins import pin_listen, pin_read
+from .pins import gpio_list, pin_listen, pin_read
 from .protocol_types import EventMessage, ResponseMessage
 from .serial import monitor_lines, write_serial
 from .simulation import pause, restart, resume, start
@@ -250,6 +250,10 @@ class WokwiClient:
             listen: True to start listening, False to stop.
         """
         return await pin_listen(self._transport, part=part, pin=pin, listen=listen)
+
+    async def gpio_list(self) -> ResponseMessage:
+        """Get a list of all GPIO pins available in the simulation."""
+        return await gpio_list(self._transport)
 
     async def set_control(
         self, part: str, control: str, value: Union[int, bool, float]
