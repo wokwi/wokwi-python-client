@@ -119,7 +119,7 @@ class WokwiClientSync:
 
         # (2) Disconnect transport
         with contextlib.suppress(Exception):
-            self._call(self._async_client.disconnect())
+            self._call(self._async_client._transport.close())
 
         # (3) Stop loop / join thread
         if self._loop.is_running():

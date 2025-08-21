@@ -49,7 +49,8 @@ class WokwiClient:
         self._transport = Transport(token, server or DEFAULT_WS_URL)
         self.last_pause_nanos = 0
         self._transport.add_event_listener("sim:pause", self._on_pause)
-        self._pause_queue = EventQueue(self._transport, "sim:pause")
+        # Lazily create in an active event loop (important for py3.9 and sync client)
+        self._pause_queue: Optional[EventQueue] = None
         self._serial_monitor_tasks: set[asyncio.Task[None]] = set()
 
     async def connect(self) -> dict[str, Any]:
@@ -181,6 +182,8 @@ class WokwiClient:
         await pause(self._transport)
         remaining_nanos = seconds * 1e9 - self.last_pause_nanos
         if remaining_nanos > 0:
+            if self._pause_queue is None:
+                self._pause_queue = EventQueue(self._transport, "sim:pause")
             self._pause_queue.flush()
             await resume(self._transport, int(remaining_nanos))
             await self._pause_queue.get()
