@@ -43,3 +43,13 @@ async def pin_listen(
     """
 
     return await transport.request("pin:listen", {"part": part, "pin": pin, "listen": listen})
+
+
+async def gpio_list(transport: Transport) -> ResponseMessage:
+    """List all GPIO pins and their current states.
+
+    Args:
+        transport: The active Transport instance.
+    """
+
+    return await transport.request("gpio:list", {})
