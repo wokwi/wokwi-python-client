@@ -11,8 +11,28 @@ This module exposes helper coroutines for issuing pin-related commands:
 #
 # SPDX-License-Identifier: MIT
 
-from .protocol_types import ResponseMessage
+from typing import TypedDict, Union
+
+from wokwi_client.protocol_types import ResponseMessage
+
 from .transport import Transport
+
+
+class PinReadMessage(TypedDict):
+    pin: str
+    direction: str
+    value: Union[float, int, bool]
+    pullUp: bool
+    pullDown: bool
+
+
+class PinListenEvent(TypedDict):
+    part: str
+    pin: str
+    direction: str
+    value: Union[float, int, bool]
+    pullUp: bool
+    pullDown: bool
 
 
 async def pin_read(transport: Transport, *, part: str, pin: str) -> ResponseMessage:
@@ -27,9 +47,7 @@ async def pin_read(transport: Transport, *, part: str, pin: str) -> ResponseMess
     return await transport.request("pin:read", {"part": part, "pin": pin})
 
 
-async def pin_listen(
-    transport: Transport, *, part: str, pin: str, listen: bool = True
-) -> ResponseMessage:
+async def pin_listen(transport: Transport, *, part: str, pin: str, listen: bool = True) -> None:
     """Enable or disable listening for changes on a pin.
 
     When listening is enabled, "pin:change" events will be emitted with the
@@ -42,7 +60,7 @@ async def pin_listen(
         listen: True to start listening, False to stop.
     """
 
-    return await transport.request("pin:listen", {"part": part, "pin": pin, "listen": listen})
+    await transport.request("pin:listen", {"part": part, "pin": pin, "listen": listen})
 
 
 async def gpio_list(transport: Transport) -> ResponseMessage:
