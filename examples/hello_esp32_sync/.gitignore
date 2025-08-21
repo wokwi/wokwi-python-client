@@ -1,0 +1,3 @@
+# Ignore the firmware files, as they are downloaded from the internet
+hello_world.bin
+hello_world.elf

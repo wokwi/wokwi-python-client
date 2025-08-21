@@ -13,6 +13,7 @@ repos:
       rev: v1.16.1
       hooks:
           - id: mypy
+            exclude: ^src/wokwi_client/client_sync\.pyi$
             additional_dependencies:
                 [pydantic==2.8.0, typing-extensions, types-click, types-requests]
 
