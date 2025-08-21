@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.0.9 - 2025-08-21
+
+- feat: add gpio_list method to retrieve all GPIO pins in WokwiClient (#6)
+- ci: disable fail-fast, only run tests if there's a CLI TOKEN available
+- test: replace subprocess calls with run_example_module helper (#7)
+- refactor: change upload methods to return None and update pin command helpers (#8)
+
 ## 0.0.8 - 2025-08-20
 
 - feat: add `download()` and `download_file()` methods (#5)
