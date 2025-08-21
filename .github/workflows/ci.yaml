@@ -9,8 +9,10 @@ on:
 jobs:
     test:
         strategy:
+            fail-fast: false
             matrix:
                 py: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+
         runs-on: ubuntu-24.04
         steps:
             - uses: actions/checkout@v4
@@ -24,5 +26,6 @@ jobs:
             - name: Run a Wokwi CI server
               uses: wokwi/wokwi-ci-server-action@v1
             - run: hatch run dev:pytest
+              if: env.WOKWI_CLI_TOKEN != ''
               env:
                   WOKWI_CLI_TOKEN: ${{ secrets.WOKWI_CLI_TOKEN }}
