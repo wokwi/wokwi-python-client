@@ -6,17 +6,17 @@ import base64
 from pathlib import Path
 from typing import Any, Optional, Union, cast
 
-from wokwi_client.framebuffer import (
-    read_framebuffer_png_bytes,
-    save_framebuffer_png,
-)
-
 from .__version__ import get_version
 from .constants import DEFAULT_WS_URL
 from .control import set_control
 from .event_queue import EventQueue
+from .exceptions import ProtocolError
 from .file_ops import download, upload, upload_file
-from .pins import PinReadMessage, pin_listen, pin_read
+from .framebuffer import (
+    read_framebuffer_png_bytes,
+    save_framebuffer_png,
+)
+from .pins import PinReadMessage, gpio_list, pin_listen, pin_read
 from .protocol_types import EventMessage
 from .serial import monitor_lines, write_serial
 from .simulation import pause, restart, resume, start
@@ -236,6 +236,18 @@ class WokwiClient:
             listen: True to start listening, False to stop.
         """
         await pin_listen(self._transport, part=part, pin=pin, listen=listen)
+
+    async def gpio_list(self) -> list[str]:
+        """Get a list of all GPIO pins available in the simulation.
+
+        Returns:
+            list[str]: Example: ["esp32:GPIO0", "esp32:GPIO1", ...]
+        """
+        resp = await gpio_list(self._transport)
+        pins_val: Any = resp.get("result", {}).get("pins")
+        if not isinstance(pins_val, list) or not all(isinstance(p, str) for p in pins_val):
+            raise ProtocolError("Malformed gpio:list response: expected result.pins: list[str]")
+        return cast(list[str], pins_val)
 
     async def set_control(self, part: str, control: str, value: Union[int, bool, float]) -> None:
         """Set a control value (e.g. simulate button press).
