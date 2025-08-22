@@ -1,13 +1,12 @@
 # SPDX-License-Identifier: MIT
 # Copyright (C) 2025, CodeMagic LTD
 
-import asyncio
 import os
 from pathlib import Path
 
 import requests
 
-from wokwi_client import GET_TOKEN_URL, WokwiClient
+from wokwi_client import GET_TOKEN_URL, WokwiClientSync
 
 EXAMPLE_DIR = Path(__file__).parent
 HELLO_WORLD_URL = "https://github.com/wokwi/esp-idf-hello-world/raw/refs/heads/main/bin"
@@ -18,7 +17,7 @@ FIRMWARE_FILES = {
 SLEEP_TIME = int(os.getenv("WOKWI_SLEEP_TIME", "10"))
 
 
-async def main() -> None:
+def main() -> None:
     token = os.getenv("WOKWI_CLI_TOKEN")
     if not token:
         raise SystemExit(
@@ -34,38 +33,34 @@ async def main() -> None:
         with open(EXAMPLE_DIR / filename, "wb") as f:
             f.write(response.content)
 
-    client = WokwiClient(token)
+    client = WokwiClientSync(token)
     print(f"Wokwi client library version: {client.version}")
 
-    hello = await client.connect()
+    hello = client.connect()
     print("Connected to Wokwi Simulator, server version:", hello["version"])
 
     # Upload the diagram and firmware files
-    await client.upload_file("diagram.json", EXAMPLE_DIR / "diagram.json")
-    await client.upload_file("hello_world.bin", EXAMPLE_DIR / "hello_world.bin")
-    await client.upload_file("hello_world.elf", EXAMPLE_DIR / "hello_world.elf")
+    client.upload_file("diagram.json", EXAMPLE_DIR / "diagram.json")
+    client.upload_file("hello_world.bin", EXAMPLE_DIR / "hello_world.bin")
+    client.upload_file("hello_world.elf", EXAMPLE_DIR / "hello_world.elf")
 
     # Start the simulation
-    await client.start_simulation(
+    client.start_simulation(
         firmware="hello_world.bin",
         elf="hello_world.elf",
     )
 
-    # Stream serial output for a few seconds
-    serial_task = asyncio.create_task(client.serial_monitor_cat())
-
+    # Stream serial output for a few seconds (non-blocking)
+    client.serial_monitor_cat()
     # Alternative lambda version
-    # serial_task = client.serial_monitor(
-    #     lambda line: print(line.decode("utf-8", errors="replace"), end="", flush=True)
-    # )
+    # client.serial_monitor(lambda line: print(line.decode("utf-8", errors="replace"), end="", flush=True))
 
     print(f"Simulation started, waiting for {SLEEP_TIME} seconds…")
-    await client.wait_until_simulation_time(SLEEP_TIME)
-    serial_task.cancel()
+    client.wait_until_simulation_time(SLEEP_TIME)
 
     # Disconnect from the simulator
-    await client.disconnect()
+    client.disconnect()
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()

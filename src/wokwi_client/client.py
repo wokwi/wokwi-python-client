@@ -2,9 +2,11 @@
 #
 # SPDX-License-Identifier: MIT
 
+import asyncio
 import base64
+import inspect
 from pathlib import Path
-from typing import Any, Optional, Union, cast
+from typing import Any, Callable, Optional, Union, cast
 
 from .__version__ import get_version
 from .constants import DEFAULT_WS_URL
@@ -47,7 +49,9 @@ class WokwiClient:
         self._transport = Transport(token, server or DEFAULT_WS_URL)
         self.last_pause_nanos = 0
         self._transport.add_event_listener("sim:pause", self._on_pause)
-        self._pause_queue = EventQueue(self._transport, "sim:pause")
+        # Lazily create in an active event loop (important for py3.9 and sync client)
+        self._pause_queue: Optional[EventQueue] = None
+        self._serial_monitor_tasks: set[asyncio.Task[None]] = set()
 
     async def connect(self) -> dict[str, Any]:
         """
@@ -61,7 +65,10 @@ class WokwiClient:
     async def disconnect(self) -> None:
         """
         Disconnect from the Wokwi simulator server.
+
+        This also stops all active serial monitors.
         """
+        self.stop_serial_monitors()
         await self._transport.close()
 
     async def upload(self, name: str, content: bytes) -> None:
@@ -175,6 +182,8 @@ class WokwiClient:
         await pause(self._transport)
         remaining_nanos = seconds * 1e9 - self.last_pause_nanos
         if remaining_nanos > 0:
+            if self._pause_queue is None:
+                self._pause_queue = EventQueue(self._transport, "sim:pause")
             self._pause_queue.flush()
             await resume(self._transport, int(remaining_nanos))
             await self._pause_queue.get()
@@ -187,6 +196,49 @@ class WokwiClient:
             pause: Whether to start the simulation paused (default: False).
         """
         await restart(self._transport, pause)
+
+    def serial_monitor(self, callback: Callable[[bytes], Any]) -> asyncio.Task[None]:
+        """
+        Start monitoring the serial output in the background and invoke `callback` for each line.
+
+        This method **does not block**: it creates and returns an asyncio.Task that runs until the
+        transport is closed or the task is cancelled. The callback may be synchronous or async.
+
+        Example:
+            task = client.serial_monitor(lambda line: print(line.decode(), end=""))
+            ... do other async work ...
+            task.cancel()
+        """
+
+        async def _runner() -> None:
+            try:
+                async for line in monitor_lines(self._transport):
+                    try:
+                        result = callback(line)
+                        if inspect.isawaitable(result):
+                            await result
+                    except Exception:
+                        # Swallow callback exceptions to keep the monitor alive.
+                        # Users can add their own error handling inside the callback.
+                        pass
+            finally:
+                # Clean up task from the set when it completes
+                self._serial_monitor_tasks.discard(task)
+
+        task = asyncio.create_task(_runner(), name="wokwi-serial-monitor")
+        self._serial_monitor_tasks.add(task)
+        return task
+
+    def stop_serial_monitors(self) -> None:
+        """
+        Stop all active serial monitor tasks.
+
+        This method cancels all tasks created by the serial_monitor method.
+        After calling this method, all active serial monitors will stop receiving data.
+        """
+        for task in self._serial_monitor_tasks.copy():
+            task.cancel()
+        self._serial_monitor_tasks.clear()
 
     async def serial_monitor_cat(self, decode_utf8: bool = True, errors: str = "replace") -> None:
         """
