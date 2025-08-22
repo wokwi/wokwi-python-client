@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "wokwi-client"
 dynamic = ["version"]
-description = "Typed, asyncio-friendly Python SDK for the Wokwi Simulation API"
+description = "Typed Python SDK for the Wokwi Simulation API with both async and synchronous interfaces"
 readme = "README.md"
 authors = [{ name = "Uri Shaked", email = "uri@wokwi.com" }]
 license = "MIT"

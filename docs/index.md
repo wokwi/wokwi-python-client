@@ -1,6 +1,6 @@
 # Wokwi Python Client Library
 
-Typed, asyncio-friendly Python SDK for the **Wokwi Simulation API**.
+Typed Python SDK for the **Wokwi Simulation API** with both async and synchronous interfaces.
 
 ## Features
 
@@ -9,7 +9,8 @@ Typed, asyncio-friendly Python SDK for the **Wokwi Simulation API**.
 - Start, pause, resume, and restart simulations
 - Monitor serial output asynchronously and write to them
 - Control peripherals and read GPIO pins
-- Fully type-annotated and easy to use with asyncio
+- Fully type-annotated
+- Two client interfaces: `WokwiClient` (async) and `WokwiClientSync` (sync)
 
 ## Installation
 
@@ -23,7 +24,9 @@ pip install wokwi-client
 
 Get your API token from [https://wokwi.com/dashboard/ci](https://wokwi.com/dashboard/ci).
 
-## Quickstart Example
+## Quickstart Examples
+
+### Async Client (WokwiClient)
 
 ```python
 import asyncio
@@ -55,7 +58,41 @@ if __name__ == "__main__":
     asyncio.run(main())
 ```
 
-See the [examples/hello_esp32/main.py](https://github.com/wokwi/wokwi-python-client/blob/main/examples/hello_esp32/main.py) for a full example including serial monitoring, and [examples/micropython_esp32/main.py](https://github.com/wokwi/wokwi-python-client/blob/main/examples/micropython_esp32/main.py) for an example of running MicroPython on a simulated ESP32 board.
+For a complete example, see [examples/hello_esp32/main.py](https://github.com/wokwi/wokwi-python-client/blob/main/examples/hello_esp32/main.py).
+
+### Sync Client (WokwiClientSync)
+
+```python
+import os
+from wokwi_client import WokwiClientSync, GET_TOKEN_URL
+
+
+def main():
+    token = os.getenv("WOKWI_CLI_TOKEN")
+    if not token:
+        raise SystemExit(
+            f"Set WOKWI_CLI_TOKEN in your environment. You can get it from {GET_TOKEN_URL}."
+        )
+
+    client = WokwiClientSync(token)
+    client.connect()
+    client.upload_file("diagram.json")
+    client.upload_file("firmware.bin")
+    client.start_simulation(firmware="firmware.bin")
+    client.serial_monitor_cat()  # Stream serial output
+    client.wait_until_simulation_time(10)  # Run simulation for 10 seconds
+    client.disconnect()
+
+
+if __name__ == "__main__":
+    main()
+```
+
+For a complete example, see [examples/hello_esp32_sync/main.py](https://github.com/wokwi/wokwi-python-client/blob/main/examples/hello_esp32_sync/main.py).
+
+### MicroPython Example
+
+See [examples/micropython_esp32/main.py](https://github.com/wokwi/wokwi-python-client/blob/main/examples/micropython_esp32/main.py) for an example of running MicroPython on a simulated ESP32 board.
 
 ## API Reference
 

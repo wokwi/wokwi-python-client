@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.0 - 2025-08-22
+
+- feat: add WokwiClientSync - a synchronous Wokwi client (#9)
+
 ## 0.0.9 - 2025-08-21
 
 - feat: add gpio_list method to retrieve all GPIO pins in WokwiClient (#6)

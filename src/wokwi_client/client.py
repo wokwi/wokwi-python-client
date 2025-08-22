@@ -31,7 +31,7 @@ class WokwiClient:
 
     This class provides methods to connect to the Wokwi simulator, upload files, control simulations,
     and monitor serial output. It is designed to be asyncio-friendly and easy to use in Python scripts
-    and applications.
+    and applications. For a synchronous interface, see WokwiClientSync.
     """
 
     version: str

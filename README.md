@@ -1,19 +1,24 @@
 # Wokwi Python Client 🚀
 
-Typed, asyncio-friendly Python SDK for the **Wokwi Simulation API**
+Typed Python SDK for the **Wokwi Simulation API** with both async and synchronous interfaces
 
 [![PyPI version](https://img.shields.io/pypi/v/wokwi-client?logo=pypi)](https://pypi.org/project/wokwi-client/)
 [![Python versions](https://img.shields.io/pypi/pyversions/wokwi-client)](https://pypi.org/project/wokwi-client/)
 [![CI](https://github.com/wokwi/wokwi-python-client/actions/workflows/ci.yaml/badge.svg?branch=main)](https://github.com/wokwi/wokwi-python-client/actions/workflows/ci.yaml)
 [![License: MIT](https://img.shields.io/github/license/wokwi/wokwi-python-client)](LICENSE)
 
-> **TL;DR:** Run and control your Wokwi simulations from Python with first-class type hints and zero boilerplate.
+> **TL;DR:** Run and control your Wokwi simulations from Python with first-class type hints, zero boilerplate, and both async and synchronous APIs.
 
 ---
 
 Wokwi is a platform for creating and running simulations of electronic circuits and embedded systems. It supports a wide range of hardware platforms, including ESP32 family, Arduino, Raspberry Pi, STM32 and more.In addition, it supports a [wide range of peripherals](https://docs.wokwi.com/getting-started/supported-hardware), including sensors, displays, motors, and debugging tools.
 
-Wokwi Python Client is a Python SDK for the Wokwi Simulation API. It allows you to run and control your Wokwi simulations from Python in a typed, asyncio-friendly way. You can use it to automate your embedded testing and development workflows.
+Wokwi Python Client is a Python SDK for the Wokwi Simulation API. It provides two client interfaces:
+
+- **`WokwiClient`**: Async client with full asyncio support for modern Python applications
+- **`WokwiClientSync`**: Synchronous client that mirrors the async API for traditional blocking code
+
+Both clients allow you to run and control your Wokwi simulations from Python in a typed, easy-to-use way. You can use them to automate your embedded testing and development workflows.
 
 ## Installation requirements
 
@@ -27,18 +32,29 @@ pip install wokwi-client
 
 ## Running the examples
 
-The basic example is in the [examples/hello_esp32/main.py](examples/hello_esp32/main.py) file. It shows how to:
+### Async Example
+
+The basic async example is in the [examples/hello_esp32/main.py](examples/hello_esp32/main.py) file. It shows how to:
 
 - Connect to the Wokwi Simulator
 - Upload a diagram and firmware files
 - Start a simulation
 - Monitor serial output asynchronously
 
-You can run the example with:
+You can run the async example with:
 
 ```bash
 pip install -e .[dev]
 python -m examples.hello_esp32.main
+```
+
+### Sync Example
+
+The synchronous example is in the [examples/hello_esp32_sync/main.py](examples/hello_esp32_sync/main.py) file. It demonstrates the same functionality using the blocking `WokwiClientSync`:
+
+```bash
+pip install -e .[dev]
+python -m examples.hello_esp32_sync.main
 ```
 
 For more examples, see the [examples](examples) directory.

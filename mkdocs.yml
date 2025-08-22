@@ -1,5 +1,5 @@
 site_name: Wokwi Python Client Library
-site_description: Typed, asyncio-friendly Python SDK for the Wokwi Simulation API
+site_description: Typed Python SDK for the Wokwi Simulation API with both async and synchronous interfaces
 site_url: https://wokwi.github.io/wokwi-python-client/
 
 repo_url: https://github.com/wokwi/wokwi-python-client
