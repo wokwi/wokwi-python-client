@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.1 - 2025-08-27
+
+- fix: change PinReadMessage and PinListenEvent value type to bool (#11)
+- fix(transport): handle errors in _background_recv (#10)
+
 ## 0.1.0 - 2025-08-22
 
 - feat: add WokwiClientSync - a synchronous Wokwi client (#9)
