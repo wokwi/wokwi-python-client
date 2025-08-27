@@ -11,7 +11,7 @@ This module exposes helper coroutines for issuing pin-related commands:
 #
 # SPDX-License-Identifier: MIT
 
-from typing import TypedDict, Union
+from typing import TypedDict
 
 from wokwi_client.protocol_types import ResponseMessage
 
@@ -21,7 +21,7 @@ from .transport import Transport
 class PinReadMessage(TypedDict):
     pin: str
     direction: str
-    value: Union[float, int, bool]
+    value: bool
     pullUp: bool
     pullDown: bool
 
@@ -30,7 +30,7 @@ class PinListenEvent(TypedDict):
     part: str
     pin: str
     direction: str
-    value: Union[float, int, bool]
+    value: bool
     pullUp: bool
     pullDown: bool
 
