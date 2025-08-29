@@ -10,8 +10,12 @@ from .transport import Transport
 
 
 async def monitor_lines(transport: Transport) -> AsyncGenerator[bytes, None]:
-    await transport.request("serial-monitor:listen", {})
+    """
+    Monitor the serial output lines.
+    """
+    # Create the queue/listener before enabling the monitor to catch all data
     with EventQueue(transport, "serial-monitor:data") as queue:
+        await transport.request("serial-monitor:listen", {})
         while True:
             event_msg = await queue.get()
             yield bytes(event_msg["payload"]["bytes"])
