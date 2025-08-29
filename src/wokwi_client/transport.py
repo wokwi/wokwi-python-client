@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 import asyncio
+import contextlib
 import json
 import os
 import warnings
@@ -43,12 +44,13 @@ class Transport:
                 "User-Agent": f"wokwi-client-py/{get_version()}",
             },
         )
+        # Handshake: read the hello BEFORE starting the background loop.
         hello: IncomingMessage = await self._recv()
         if hello["type"] != MSG_TYPE_HELLO or hello.get("protocolVersion") != PROTOCOL_VERSION:
             raise ProtocolError(f"Unsupported protocol handshake: {hello}")
         hello_msg = cast(HelloMessage, hello)
         self._closed = False
-        # Start background message processor
+        # Start background message processor AFTER successful hello.
         self._recv_task = asyncio.create_task(self._background_recv(throw_error))
         return {"version": hello_msg["appVersion"]}
 
@@ -56,15 +58,12 @@ class Transport:
         self._closed = True
         if self._recv_task:
             self._recv_task.cancel()
-            try:
+            with contextlib.suppress(asyncio.CancelledError):
                 await self._recv_task
-            except asyncio.CancelledError:
-                pass
         if self._ws:
             await self._ws.close()
 
     def add_event_listener(self, event_type: str, listener: Callable[[EventMessage], Any]) -> None:
-        """Register a listener for a specific event type."""
         if event_type not in self._event_listeners:
             self._event_listeners[event_type] = []
         self._event_listeners[event_type].append(listener)
@@ -72,7 +71,6 @@ class Transport:
     def remove_event_listener(
         self, event_type: str, listener: Callable[[EventMessage], Any]
     ) -> None:
-        """Remove a previously registered listener for a specific event type."""
         if event_type in self._event_listeners:
             self._event_listeners[event_type] = [
                 registered_listener
@@ -90,52 +88,72 @@ class Transport:
                 await result
 
     async def request(self, command: str, params: dict[str, Any]) -> ResponseMessage:
-        msg_id = str(self._next_id)
-        self._next_id += 1
         if self._ws is None:
             raise WokwiError("Not connected")
+        msg_id = str(self._next_id)
+        self._next_id += 1
+
         loop = asyncio.get_running_loop()
         future: asyncio.Future[ResponseMessage] = loop.create_future()
         self._response_futures[msg_id] = future
+
         await self._ws.send(
             json.dumps({"type": "command", "command": command, "params": params, "id": msg_id})
         )
         try:
             resp_msg_resp = await future
             if resp_msg_resp.get("error"):
-                result = resp_msg_resp["result"]
-                raise ServerError(result["message"])
+                result = resp_msg_resp.get("result", {})
+                raise ServerError(result.get("message", "Unknown server error"))
             return resp_msg_resp
         finally:
-            del self._response_futures[msg_id]
+            # Remove future mapping if still present (be defensive)
+            self._response_futures.pop(msg_id, None)
 
-    async def _background_recv(self, throw_error: bool = True) -> None:
+    async def _background_recv(self, throw_error: bool = True) -> None:  # noqa: PLR0912
         try:
             while not self._closed and self._ws is not None:
                 msg: IncomingMessage = await self._recv()
                 if msg["type"] == MSG_TYPE_EVENT:
-                    resp_msg_event = cast(EventMessage, msg)
-                    await self._dispatch_event(resp_msg_event)
+                    await self._dispatch_event(cast(EventMessage, msg))
                 elif msg["type"] == MSG_TYPE_RESPONSE:
                     resp_msg_resp = cast(ResponseMessage, msg)
-                    future = self._response_futures.get(resp_msg_resp["id"])
+                    resp_id = str(resp_msg_resp.get("id"))
+                    future = self._response_futures.get(resp_id)
                     if future is None or future.done():
                         continue
                     future.set_result(resp_msg_resp)
-        except (websockets.ConnectionClosed, asyncio.CancelledError):
-            pass
-        except Exception as e:
-            warnings.warn(f"Background recv error: {e}", RuntimeWarning)
-
-            if throw_error:
-                self._closed = True
-                # Cancel all pending response futures
-                for future in self._response_futures.values():
-                    if not future.done():
-                        future.set_exception(e)
+        except asyncio.CancelledError:
+            # Expected during shutdown via close()
+            raise
+        except websockets.ConnectionClosed as e:
+            # Mark closed and fail pending futures to avoid hangs.
+            self._closed = True
+            for fut in list(self._response_futures.values()):
+                if not fut.done():
+                    fut.set_exception(e)
+            with contextlib.suppress(Exception):
                 if self._ws:
                     await self._ws.close()
+            if throw_error:
                 raise
+        except Exception as e:
+            warnings.warn(f"Background recv error: {e}", RuntimeWarning)
+            if throw_error:
+                self._closed = True
+                for fut in list(self._response_futures.values()):
+                    if not fut.done():
+                        fut.set_exception(e)
+                with contextlib.suppress(Exception):
+                    if self._ws:
+                        await self._ws.close()
+                raise
+        finally:
+            # If we’re exiting the loop and marked closed, ensure no future hangs.
+            if self._closed:
+                for fut in list(self._response_futures.values()):
+                    if not fut.done():
+                        fut.set_exception(RuntimeError("Transport receive loop exited"))
 
     async def _recv(self) -> IncomingMessage:
         if self._ws is None:
@@ -153,10 +171,6 @@ class Transport:
         if message["type"] == "error":
             raise WokwiError(f"Server error: {message['message']}")
         if message["type"] == "response" and message.get("error"):
-            result = (
-                message["result"]
-                if "result" in message
-                else {"code": -1, "message": "Unknown error"}
-            )
+            result = message.get("result", {"code": -1, "message": "Unknown error"})
             raise WokwiError(f"Server error {result['code']}: {result['message']}")
         return cast(IncomingMessage, message)
