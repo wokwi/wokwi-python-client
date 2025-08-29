@@ -39,10 +39,6 @@ class WokwiClientSync:
         tracked, so we can cancel & drain them on `disconnect()`.
     """
 
-    # Public attributes mirrored for convenience
-    version: str
-    last_pause_nanos: int  # this proxy resolves via __getattr__
-
     def __init__(self, token: str, server: str | None = None):
         # Create a new event loop for the background thread
         self._loop = asyncio.new_event_loop()
@@ -54,12 +50,10 @@ class WokwiClientSync:
         )
         self._thread.start()
         # **Wait until loop is fully started before proceeding** (prevents race conditions)
-        if not self._loop_started_event.wait(timeout=5.0):  # timeout to avoid deadlock
+        if not self._loop_started_event.wait(timeout=8.0):  # timeout to avoid deadlock
             raise RuntimeError("WokwiClientSync event loop failed to start")
         # Initialize underlying async client on the running loop
         self._async_client = WokwiClient(token, server)
-        # Mirror version attribute for quick access
-        self.version = self._async_client.version
         # Track background monitor tasks (futures) for cancellation on exit
         self._bg_futures: set[Future[Any]] = set()
         # Flag to avoid double-closing

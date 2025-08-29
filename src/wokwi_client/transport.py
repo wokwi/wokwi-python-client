@@ -44,13 +44,12 @@ class Transport:
                 "User-Agent": f"wokwi-client-py/{get_version()}",
             },
         )
-        # Handshake: read the hello BEFORE starting the background loop.
         hello: IncomingMessage = await self._recv()
         if hello["type"] != MSG_TYPE_HELLO or hello.get("protocolVersion") != PROTOCOL_VERSION:
             raise ProtocolError(f"Unsupported protocol handshake: {hello}")
         hello_msg = cast(HelloMessage, hello)
         self._closed = False
-        # Start background message processor AFTER successful hello.
+        # Start background message processor after successful hello.
         self._recv_task = asyncio.create_task(self._background_recv(throw_error))
         return {"version": hello_msg["appVersion"]}
 
