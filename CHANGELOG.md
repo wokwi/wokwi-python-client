@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.2 - 2025-09-03
+
+- fix(client_sync): improve event loop initialization and background task management (#12)
+
 ## 0.1.1 - 2025-08-27
 
 - fix: change PinReadMessage and PinListenEvent value type to bool (#11)
