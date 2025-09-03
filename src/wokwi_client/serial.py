@@ -10,6 +10,9 @@ from .transport import Transport
 
 
 async def monitor_lines(transport: Transport) -> AsyncGenerator[bytes, None]:
+    """
+    Monitor the serial output lines.
+    """
     await transport.request("serial-monitor:listen", {})
     with EventQueue(transport, "serial-monitor:data") as queue:
         while True:
