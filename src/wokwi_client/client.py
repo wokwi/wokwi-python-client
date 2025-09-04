@@ -81,15 +81,20 @@ class WokwiClient:
         """
         await upload(self._transport, name, content)
 
-    async def upload_file(self, filename: str, local_path: Optional[Path] = None) -> None:
+    async def upload_file(self, filename: str, local_path: Optional[Path] = None) -> str:
         """
         Upload a local file to the simulator.
+        If you specify the local_path to the file `flasher_args.json` (IDF flash information),
+        the contents of the file will be processed and the correct firmware file will be
+        uploaded instead, returning the firmware filename.
 
         Args:
             filename: The name to use for the uploaded file.
             local_path: Optional path to the local file. If not provided, uses filename as the path.
+        Returns:
+            The filename of the uploaded file (useful for idf when uploading flasher_args.json).
         """
-        await upload_file(self._transport, filename, local_path)
+        return await upload_file(self._transport, filename, local_path)
 
     async def download(self, name: str) -> bytes:
         """
