@@ -6,6 +6,8 @@ import base64
 from pathlib import Path
 from typing import Optional
 
+from wokwi_client.idf import resolveIdfFirmware
+
 from .models import UploadParams
 from .protocol_types import ResponseMessage
 from .transport import Transport
@@ -13,10 +15,15 @@ from .transport import Transport
 
 async def upload_file(
     transport: Transport, filename: str, local_path: Optional[Path] = None
-) -> ResponseMessage:
-    path = Path(local_path or filename)
-    content = path.read_bytes()
-    return await upload(transport, filename, content)
+) -> str:
+    firmware_path = local_path or filename
+    if str(firmware_path).endswith("flasher_args.json"):
+        filename = "firmware.bin"
+        content = resolveIdfFirmware(str(firmware_path))
+    else:
+        content = Path(firmware_path).read_bytes()
+    await upload(transport, filename, content)
+    return filename
 
 
 async def upload(transport: Transport, name: str, content: bytes) -> ResponseMessage:
