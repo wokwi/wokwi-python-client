@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.0 - 2025-09-07
+
+- feat: add support for flasher_args.json upload (#13)
+
 ## 0.1.2 - 2025-09-03
 
 - fix(client_sync): improve event loop initialization and background task management (#12)
