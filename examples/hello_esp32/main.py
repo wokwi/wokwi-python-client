@@ -8,9 +8,6 @@ from pathlib import Path
 from examples.helper.github_download import download_github_dir
 from wokwi_client import GET_TOKEN_URL, WokwiClient
 
-# sys.path.append(str(Path(__file__).parent.parent))
-# from github_download import download_github_dir
-
 EXAMPLE_DIR = Path(__file__).parent
 USER = "espressif"
 REPO = "pytest-embedded"
