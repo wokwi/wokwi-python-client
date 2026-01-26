@@ -56,3 +56,6 @@ desktop.ini
 *.swp
 *.swo
 *~
+
+# Generated example outputs
+*.vcd

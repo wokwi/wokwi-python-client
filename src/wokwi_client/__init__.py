@@ -15,6 +15,7 @@ from .__version__ import get_version
 from .client import WokwiClient
 from .client_sync import WokwiClientSync
 from .constants import GET_TOKEN_URL
+from .vcd import VCDData
 
 __version__ = get_version()
-__all__ = ["WokwiClient", "WokwiClientSync", "__version__", "GET_TOKEN_URL"]
+__all__ = ["WokwiClient", "WokwiClientSync", "VCDData", "__version__", "GET_TOKEN_URL"]

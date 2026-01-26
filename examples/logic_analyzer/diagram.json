@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "author": "Uri Shaked",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "wokwi-clock-generator",
+      "id": "clk1",
+      "top": -57.6,
+      "left": -38.4,
+      "attrs": { "frequency": "1000" }
+    },
+    {
+      "type": "wokwi-logic-analyzer",
+      "id": "logic1",
+      "top": 0,
+      "left": 100,
+      "attrs": { "channelNames": "CLK" }
+    }
+  ],
+  "connections": [
+    ["clk1:CLK", "logic1:D0", "green", ["v0"]]
+  ],
+  "dependencies": {}
+}

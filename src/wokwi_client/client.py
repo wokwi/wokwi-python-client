@@ -18,6 +18,7 @@ from .framebuffer import (
     read_framebuffer_png_bytes,
     save_framebuffer_png,
 )
+from .vcd import VCDData, read_vcd, save_vcd
 from .pins import PinReadMessage, gpio_list, pin_listen, pin_read
 from .protocol_types import EventMessage
 from .serial import monitor_lines, write_serial
@@ -323,3 +324,33 @@ class WokwiClient:
     async def save_framebuffer_png(self, id: str, path: Path, overwrite: bool = True) -> Path:
         """Save the current framebuffer as a PNG file."""
         return await save_framebuffer_png(self._transport, id=id, path=path, overwrite=overwrite)
+
+    async def read_vcd(self) -> VCDData:
+        """Read logic analyzer data as VCD (Value Change Dump).
+
+        Returns the captured signals from the logic analyzer in VCD format,
+        which can be viewed in tools like PulseView or GTKWave.
+
+        Returns:
+            VCD data containing the vcd string, channel_count, and sample_count.
+
+        Raises:
+            WokwiError: If no logic analyzer is present in the diagram.
+        """
+        return await read_vcd(self._transport)
+
+    async def save_vcd(self, path: Path, overwrite: bool = True) -> VCDData:
+        """Save logic analyzer VCD data to a file.
+
+        Args:
+            path: Destination file path.
+            overwrite: Overwrite existing file (default True).
+
+        Returns:
+            VCD data containing the vcd string, channel_count, and sample_count.
+
+        Raises:
+            WokwiError: If file exists and overwrite=False, or if no logic
+                analyzer is present in the diagram.
+        """
+        return await save_vcd(self._transport, path=path, overwrite=overwrite)

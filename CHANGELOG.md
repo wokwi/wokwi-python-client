@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.0 - 2026-01-26
+
+- feat: add `read_vcd()` and `save_vcd()` methods to export logic analyzer data as VCD
+
 ## 0.2.0 - 2025-09-07
 
 - feat: add support for flasher_args.json upload (#13)
