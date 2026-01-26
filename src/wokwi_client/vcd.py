@@ -75,9 +75,7 @@ def _extract_vcd_data(resp: ResponseMessage) -> VCDData:
     return VCDData(vcd=vcd, channel_count=channel_count, sample_count=sample_count)
 
 
-async def save_vcd(
-    transport: Transport, *, path: Path, overwrite: bool = True
-) -> VCDData:
+async def save_vcd(transport: Transport, *, path: Path, overwrite: bool = True) -> VCDData:
     """Save logic analyzer VCD data to a file.
 
     Args:

@@ -18,12 +18,12 @@ from .framebuffer import (
     read_framebuffer_png_bytes,
     save_framebuffer_png,
 )
-from .vcd import VCDData, read_vcd, save_vcd
 from .pins import PinReadMessage, gpio_list, pin_listen, pin_read
 from .protocol_types import EventMessage
 from .serial import monitor_lines, write_serial
 from .simulation import pause, restart, resume, start
 from .transport import Transport
+from .vcd import VCDData, read_vcd, save_vcd
 
 
 class WokwiClient:
