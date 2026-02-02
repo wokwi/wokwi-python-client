@@ -4,16 +4,15 @@
 import os
 from pathlib import Path
 
-import requests
-
+from examples.helper.github_download import download_github_dir
 from wokwi_client import GET_TOKEN_URL, WokwiClientSync
 
 EXAMPLE_DIR = Path(__file__).parent
-HELLO_WORLD_URL = "https://github.com/wokwi/esp-idf-hello-world/raw/refs/heads/main/bin"
-FIRMWARE_FILES = {
-    "hello_world.bin": f"{HELLO_WORLD_URL}/hello_world.bin",
-    "hello_world.elf": f"{HELLO_WORLD_URL}/hello_world.elf",
-}
+USER = "espressif"
+REPO = "pytest-embedded"
+PATH = "tests/fixtures/hello_world_esp32/build"
+REF = "7e66a07870d1cd97a454318892c6f6225def3144"
+
 SLEEP_TIME = int(os.getenv("WOKWI_SLEEP_TIME", "10"))
 
 
@@ -24,14 +23,15 @@ def main() -> None:
             f"Set WOKWI_CLI_TOKEN in your environment. You can get it from {GET_TOKEN_URL}."
         )
 
-    for filename, url in FIRMWARE_FILES.items():
-        if (EXAMPLE_DIR / filename).exists():
-            continue
-        print(f"Downloading {filename} from {url}")
-        response = requests.get(url)
-        response.raise_for_status()
-        with open(EXAMPLE_DIR / filename, "wb") as f:
-            f.write(response.content)
+    # Automatically download build files from GitHub if missing
+    build_dir = EXAMPLE_DIR / "build"
+    download_github_dir(
+        user=USER,
+        repo=REPO,
+        path=PATH,
+        base_path=build_dir,
+        ref=REF,
+    )
 
     client = WokwiClientSync(token)
     print(f"Wokwi client library version: {client.version}")
@@ -41,13 +41,13 @@ def main() -> None:
 
     # Upload the diagram and firmware files
     client.upload_file("diagram.json", EXAMPLE_DIR / "diagram.json")
-    client.upload_file("hello_world.bin", EXAMPLE_DIR / "hello_world.bin")
-    client.upload_file("hello_world.elf", EXAMPLE_DIR / "hello_world.elf")
+    filename = client.upload_file(
+        "flasher_args.json", EXAMPLE_DIR / "build" / "flasher_args.json"
+    )
 
     # Start the simulation
     client.start_simulation(
-        firmware="hello_world.bin",
-        elf="hello_world.elf",
+        firmware=filename,
     )
 
     # Stream serial output for a few seconds (non-blocking)
