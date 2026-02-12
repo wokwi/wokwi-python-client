@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.0 - TBD
+
+- feat: add `touch_event()` method for touchscreen simulation
+
 ## 0.3.0 - 2026-01-26
 
 - feat: add `read_vcd()` and `save_vcd()` methods to export logic analyzer data as VCD

@@ -22,6 +22,7 @@ from .pins import PinReadMessage, gpio_list, pin_listen, pin_read
 from .protocol_types import EventMessage
 from .serial import monitor_lines, write_serial
 from .simulation import pause, restart, resume, start
+from .touch import touch_event
 from .transport import Transport
 from .vcd import VCDData, read_vcd, save_vcd
 
@@ -316,6 +317,33 @@ class WokwiClient:
             value: Control value to set (float).
         """
         await set_control(self._transport, part=part, control=control, value=value)
+
+    async def touch_event(
+        self,
+        part: str,
+        x: float,
+        y: float,
+        event: str,
+        release_after: Optional[int] = None,
+    ) -> None:
+        """Send a touch event to a part with a touchscreen.
+
+        Args:
+            part: Part id (e.g. "lcd1").
+            x: X coordinate (touch controller coordinates).
+            y: Y coordinate (touch controller coordinates).
+            event: Touch event type: "press", "release", or "move".
+            release_after: For "press" events, automatically release
+                after this many nanoseconds of simulation time (optional).
+        """
+        await touch_event(
+            self._transport,
+            part=part,
+            x=x,
+            y=y,
+            event=event,
+            release_after=release_after,
+        )
 
     async def read_framebuffer_png_bytes(self, id: str) -> bytes:
         """Return the current framebuffer as PNG bytes."""
