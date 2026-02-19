@@ -13,7 +13,14 @@ from .constants import DEFAULT_WS_URL
 from .control import set_control
 from .event_queue import EventQueue
 from .exceptions import ProtocolError
-from .file_ops import download, upload, upload_file
+from .file_ops import (
+    FlashSection,
+    IdfFirmwareUploadResult,
+    download,
+    upload,
+    upload_file,
+    upload_idf_firmware,
+)
 from .framebuffer import (
     read_framebuffer_png_bytes,
     save_framebuffer_png,
@@ -86,17 +93,28 @@ class WokwiClient:
     async def upload_file(self, filename: str, local_path: Optional[Path] = None) -> str:
         """
         Upload a local file to the simulator.
-        If you specify the local_path to the file `flasher_args.json` (IDF flash information),
-        the contents of the file will be processed and the correct firmware file will be
-        uploaded instead, returning the firmware filename.
 
         Args:
             filename: The name to use for the uploaded file.
             local_path: Optional path to the local file. If not provided, uses filename as the path.
         Returns:
-            The filename of the uploaded file (useful for idf when uploading flasher_args.json).
+            The filename of the uploaded file.
         """
         return await upload_file(self._transport, filename, local_path)
+
+    async def upload_idf_firmware(self, flasher_args_path: "str | Path") -> IdfFirmwareUploadResult:
+        """
+        Upload ESP-IDF firmware from a flasher_args.json file.
+
+        Reads flasher_args.json, uploads each flash section (bootloader, partition table, app)
+        individually, and returns the section metadata needed for start_simulation().
+
+        Args:
+            flasher_args_path: Path to the flasher_args.json file.
+        Returns:
+            An IdfFirmwareUploadResult with firmware sections and optional flash_size.
+        """
+        return await upload_idf_firmware(self._transport, flasher_args_path)
 
     async def download(self, name: str) -> bytes:
         """
@@ -128,10 +146,11 @@ class WokwiClient:
 
     async def start_simulation(
         self,
-        firmware: str,
+        firmware: "str | list[FlashSection] | None" = None,
         elf: Optional[str] = None,
         pause: bool = False,
         chips: list[str] = [],
+        flash_size: Optional[int] = None,
     ) -> None:
         """
         Start a new simulation with the given parameters.
@@ -140,6 +159,9 @@ class WokwiClient:
         `upload()` or `upload_file()` methods.
         The firmware file is required for the simulation to run.
         The ELF file is optional and can speed up the simulation in some cases.
+
+        For ESP-IDF projects, use `upload_idf_firmware()` to upload firmware sections
+        from flasher_args.json, then pass the result's firmware and flash_size here.
 
         The optional `chips` parameter can be used to load custom chips into the simulation.
         For each custom chip, you need to upload two files:
@@ -151,14 +173,17 @@ class WokwiClient:
         and reference it in your diagram.json file by adding a part with the type `chip-inverter`.
 
         Args:
-            firmware: The firmware binary filename.
+            firmware: Either a firmware filename (str) or a list of FlashSection
+                objects (from upload_idf_firmware).
             elf: The ELF file filename (optional).
             pause: Whether to start the simulation paused (default: False).
             chips: List of custom chips to load into the simulation (default: empty list).
+            flash_size: Flash size in megabytes (optional, typically from IdfFirmwareUploadResult).
         """
         await start(
             self._transport,
             firmware=firmware,
+            flash_size=flash_size,
             elf=elf,
             pause=pause,
             chips=chips,

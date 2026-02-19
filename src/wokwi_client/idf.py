@@ -1,8 +1,9 @@
 import json
+import logging
 import os
-from typing import TypedDict
+from typing import Optional, TypedDict
 
-MAX_FIRMWARE_SIZE = 4 * 1024 * 1024  # 4MB
+logger = logging.getLogger(__name__)
 
 
 class FirmwarePart(TypedDict):
@@ -10,20 +11,21 @@ class FirmwarePart(TypedDict):
     data: bytes
 
 
-def resolveIdfFirmware(flasher_args_path: str) -> bytes:
+class IdfFirmwareResult(TypedDict):
+    parts: list[FirmwarePart]
+    flash_size: Optional[int]
+
+
+def resolveIdfFirmware(flasher_args_path: str) -> IdfFirmwareResult:
     """
     Resolve ESP32 firmware from flasher_args.json file.
-    Implemented based on the logic from the wokwi-cli.
-    - https://github.com/wokwi/wokwi-cli/blob/1726692465f458420f71bc4dbd100aeedf2e37bb/src/uploadFirmware.ts
-
-    More about flasher_args.json:
-    - https://docs.espressif.com/projects/esp-idf/en/release-v5.5/esp32/api-guides/build-system.html
+    Returns individual flash sections with their offsets, plus flash_size if available.
 
     Args:
         flasher_args_path: Path to the flasher_args.json file
 
     Returns:
-        Combined firmware binary data as bytes
+        IdfFirmwareResult with individual parts and optional flash_size
 
     Raises:
         ValueError: If flasher_args.json is invalid or files are missing
@@ -39,10 +41,8 @@ def resolveIdfFirmware(flasher_args_path: str) -> bytes:
         raise ValueError("flash_files is not defined in flasher_args.json")
 
     firmware_parts: list[FirmwarePart] = []
-    firmware_size = 0
     flasher_dir = os.path.dirname(flasher_args_path)
 
-    # Process each flash file entry
     for offset_str, file_path in flasher_args["flash_files"].items():
         try:
             offset = int(offset_str, 16)
@@ -58,24 +58,14 @@ def resolveIdfFirmware(flasher_args_path: str) -> bytes:
             raise FileNotFoundError(f"Firmware file not found: {full_file_path}")
 
         firmware_parts.append({"offset": offset, "data": data})
-        firmware_size = max(firmware_size, offset + len(data))
 
-    if firmware_size > MAX_FIRMWARE_SIZE:
-        raise ValueError(
-            f"Firmware size ({firmware_size} bytes) exceeds the maximum supported size ({MAX_FIRMWARE_SIZE} bytes)"
-        )
+    flash_size = None
+    flash_settings = flasher_args.get("flash_settings")
+    if flash_settings and "flash_size" in flash_settings:
+        raw = flash_settings["flash_size"]
+        if isinstance(raw, str) and raw.endswith("MB"):
+            flash_size = int(raw[:-2])
+        else:
+            logger.warning("Unexpected flash_size format in flasher_args.json: %r", raw)
 
-    # Create combined firmware binary
-    firmware_data = bytearray(firmware_size)
-
-    # Fill with 0xFF (typical flash erased state)
-    for i in range(firmware_size):
-        firmware_data[i] = 0xFF
-
-    # Write each firmware part to the correct offset
-    for part in firmware_parts:
-        offset = part["offset"]
-        data = part["data"]
-        firmware_data[offset : offset + len(data)] = data
-
-    return bytes(firmware_data)
+    return {"parts": firmware_parts, "flash_size": flash_size}

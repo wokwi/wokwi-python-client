@@ -1,7 +1,9 @@
 # Changelog
 
-## 0.4.0 - TBD
+## 0.4.0 - 2026-02-19
 
+- feat: add `upload_idf_firmware()` method for uploading ESP-IDF flash sections individually
+- feat: add `flash_size` parameter to `start_simulation()`
 - feat: add `touch_event()` method for touchscreen simulation
 
 ## 0.3.0 - 2026-01-26

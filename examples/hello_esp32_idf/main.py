@@ -45,13 +45,12 @@ async def main() -> None:
 
     # Upload the diagram and firmware files
     await client.upload_file("diagram.json", EXAMPLE_DIR / "diagram.json")
-    filename = await client.upload_file(
-        "flasher_args.json", EXAMPLE_DIR / "build" / "flasher_args.json"
-    )
+    idf = await client.upload_idf_firmware(EXAMPLE_DIR / "build" / "flasher_args.json")
 
     # Start the simulation
     await client.start_simulation(
-        firmware=filename,
+        firmware=idf.firmware,
+        flash_size=idf.flash_size,
     )
 
     # Stream serial output for a few seconds
@@ -67,7 +66,7 @@ async def main() -> None:
 
     # await client.set_control("dsa", "dsdsa", 1)
 
-    print(f"Simulation started, waiting for {SLEEP_TIME} seconds…")
+    print(f"Simulation started, waiting for {SLEEP_TIME} seconds...")
     await client.wait_until_simulation_time(SLEEP_TIME)
     serial_task.cancel()
 

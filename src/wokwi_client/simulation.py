@@ -2,23 +2,29 @@
 #
 # SPDX-License-Identifier: MIT
 
-from typing import Optional
+from typing import Any, Optional
 
 from .protocol_types import ResponseMessage
 from .transport import Transport
 
 
-async def start(
+async def start(  # noqa: PLR0913
     transport: Transport,
     *,
-    firmware: str,
+    firmware: Any = None,
+    flash_size: Optional[int] = None,
     elf: Optional[str] = None,
     pause: bool = False,
     chips: list[str] = [],
 ) -> ResponseMessage:
-    return await transport.request(
-        "sim:start", {"firmware": firmware, "elf": elf, "pause": pause, "chips": chips}
-    )
+    params: dict[str, Any] = {"elf": elf, "pause": pause, "chips": chips}
+    if isinstance(firmware, list):
+        params["firmware"] = [{"offset": s.offset, "file": s.file} for s in firmware]
+    elif firmware is not None:
+        params["firmware"] = firmware
+    if flash_size:
+        params["flashSize"] = flash_size
+    return await transport.request("sim:start", params)
 
 
 async def pause(transport: Transport) -> ResponseMessage:

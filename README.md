@@ -57,6 +57,15 @@ pip install -e .[dev]
 python -m examples.hello_esp32_sync.main
 ```
 
+### ESP-IDF Example
+
+The ESP-IDF example is in the [examples/hello_esp32_idf/main.py](examples/hello_esp32_idf/main.py) file. It demonstrates uploading ESP-IDF firmware using `flasher_args.json`:
+
+```bash
+pip install -e .[dev]
+python -m examples.hello_esp32_idf.main
+```
+
 For more examples, see the [examples](examples) directory.
 
 ## Documentation
