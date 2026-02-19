@@ -30,3 +30,4 @@ jobs:
               if: env.WOKWI_CLI_TOKEN != ''
               env:
                   WOKWI_CLI_TOKEN: ${{ secrets.WOKWI_CLI_TOKEN }}
+                  GITHUB_TOKEN: ${{ github.token }}

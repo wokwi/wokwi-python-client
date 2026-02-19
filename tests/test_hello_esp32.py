@@ -20,7 +20,7 @@ def test_hello_esp32_sync_example() -> None:
 
 
 def test_hello_esp32_idf_example() -> None:
-    """Sync hello_esp32 example should run and exit with 0."""
+    """IDF hello_esp32 example should run and exit with 0."""
     result = run_example_module("examples.hello_esp32_idf.main")
-    assert result.returncode == 0
+    assert result.returncode == 0, f"stderr: {result.stderr}"
     assert "cpu_start: Starting scheduler on APP CPU" in result.stdout
