@@ -16,6 +16,7 @@ from .client import WokwiClient
 from .client_sync import WokwiClientSync
 from .constants import GET_TOKEN_URL
 from .file_ops import FlashSection, IdfFirmwareUploadResult
+from .models import SDCardConfig, SDCardFile
 from .vcd import VCDData
 
 __version__ = get_version()
@@ -24,6 +25,8 @@ __all__ = [
     "WokwiClientSync",
     "FlashSection",
     "IdfFirmwareUploadResult",
+    "SDCardConfig",
+    "SDCardFile",
     "VCDData",
     "__version__",
     "GET_TOKEN_URL",

@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- feat: add `sdcards` parameter to `start_simulation()` (`SDCardConfig`) to preload the simulated micro SD card from uploaded files or a raw image
+- feat: add `export_sdcard_image()` and `export_sdcard_files()` to read the micro SD card contents back
+
 ## 0.4.0 - 2026-02-19
 
 - feat: add `upload_idf_firmware()` method for uploading ESP-IDF flash sections individually
