@@ -9,7 +9,6 @@ from pathlib import Path
 from typing import Any, Callable, Optional, Union, cast
 
 from .__version__ import get_version
-from .constants import DEFAULT_WS_URL
 from .control import set_control
 from .event_queue import EventQueue
 from .exceptions import ProtocolError
@@ -30,7 +29,7 @@ from .protocol_types import EventMessage
 from .serial import monitor_lines, write_serial
 from .simulation import pause, restart, resume, start
 from .touch import touch_event
-from .transport import Transport
+from .transport import TRANSPORT_DEFAULT_WS_URL, Transport
 from .vcd import VCDData, read_vcd, save_vcd
 
 
@@ -52,10 +51,11 @@ class WokwiClient:
 
         Args:
             token: API token for authentication (get from https://wokwi.com/dashboard/ci).
-            server: Optional custom server URL. Defaults to the public Wokwi server.
+            server: Optional custom server URL. Defaults to the WOKWI_CLI_SERVER environment
+                variable, or the public Wokwi server if it is not set.
         """
         self.version = get_version()
-        self._transport = Transport(token, server or DEFAULT_WS_URL)
+        self._transport = Transport(token, server or TRANSPORT_DEFAULT_WS_URL)
         self.last_pause_nanos = 0
         self._transport.add_event_listener("sim:pause", self._on_pause)
         # Lazily create in an active event loop (important for py3.9 and sync client)
