@@ -14,7 +14,7 @@ Typed Python SDK for the **Wokwi Simulation API** with both async and synchronou
 
 ## Installation
 
-Requires Python ≥ 3.9
+Requires Python ≥ 3.10
 
 ```bash
 pip install wokwi-client

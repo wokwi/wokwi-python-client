@@ -22,7 +22,7 @@ Both clients allow you to run and control your Wokwi simulations from Python in 
 
 ## Installation requirements
 
-- Python ≥ 3.9
+- Python ≥ 3.10
 - An API token from [https://wokwi.com/dashboard/ci](https://wokwi.com/dashboard/ci).
 
 Install the library with:

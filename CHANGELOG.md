@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.0 - 2026-10-02
+
+- **Breaking:** drop Python 3.9 support (end of life 2025-10-31; current hatch/mypy no longer run on it). `requires-python` is now `>=3.10`. Python 3.14 added to CI and classifiers.
+
 ## 0.4.1 - 2026-10-02
 
 - fix: `WokwiClient` and `WokwiClientSync` now honor the `WOKWI_CLI_SERVER` environment variable when no `server` argument is given (#18, thanks @lucasssvaz). Previously the public server was always used, so self-hosted CI servers (e.g. `wokwi/wokwi-ci-server-action`) were silently bypassed.
