@@ -197,10 +197,10 @@ class WokwiClient:
         The optional `chips` parameter can be used to load custom chips into the simulation.
         For each custom chip, you need to upload two files:
         - A JSON file with the chip definition, called `<chip_name>.chip.json`.
-        - A binary file with the chip firmware, called `<chip_name>.chip.bin`.
+        - A WebAssembly file with the compiled chip, called `<chip_name>.chip.wasm`.
 
         For example, to load the `inverter` chip, you need to upload the `inverter.chip.json`
-        and `inverter.chip.bin` files. Then you can pass `["inverter"]` to the `chips` parameter,
+        and `inverter.chip.wasm` files. Then you can pass `["inverter"]` to the `chips` parameter,
         and reference it in your diagram.json file by adding a part with the type `chip-inverter`.
 
         Args:
