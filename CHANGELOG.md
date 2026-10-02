@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.1 - 2026-10-02
+
+- fix: `WokwiClient` and `WokwiClientSync` now honor the `WOKWI_CLI_SERVER` environment variable when no `server` argument is given (#18, thanks @lucasssvaz). Previously the public server was always used, so self-hosted CI servers (e.g. `wokwi/wokwi-ci-server-action`) were silently bypassed.
+- fix: `WOKWI_CLI_SERVER` is now read when a `Transport`/client is created rather than when the module is imported, so setting it after `import wokwi_client` works as expected. The `Transport(url=...)` parameter is now optional. The undocumented `wokwi_client.transport.TRANSPORT_DEFAULT_WS_URL` constant was removed.
+- test: add token-free unit tests for server URL resolution (explicit argument > `WOKWI_CLI_SERVER` > public server)
+
 ## 0.4.0 - 2026-02-19
 
 - feat: add `upload_idf_firmware()` method for uploading ESP-IDF flash sections individually

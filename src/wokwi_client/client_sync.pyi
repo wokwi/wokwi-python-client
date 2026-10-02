@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Callable
 
+from .client import WokwiClient
 from .file_ops import FlashSection, IdfFirmwareUploadResult
 from .pins import PinReadMessage
 from .vcd import VCDData
@@ -20,6 +21,7 @@ class WokwiClientSync:
 
     version: str
     last_pause_nanos: int
+    _async_client: WokwiClient
 
     def __init__(self, token: str, server: str | None = None) -> None: ...
 

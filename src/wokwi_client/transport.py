@@ -22,13 +22,19 @@ from .constants import (
 from .exceptions import ProtocolError, ServerError, WokwiError
 from .protocol_types import EventMessage, HelloMessage, IncomingMessage, ResponseMessage
 
-TRANSPORT_DEFAULT_WS_URL = os.getenv("WOKWI_CLI_SERVER", DEFAULT_WS_URL)
-
 
 class Transport:
-    def __init__(self, token: str, url: str = TRANSPORT_DEFAULT_WS_URL):
+    def __init__(self, token: str, url: Optional[str] = None):
+        """
+        Args:
+            token: API token for authentication.
+            url: WebSocket server URL. Defaults to the ``WOKWI_CLI_SERVER`` environment
+                variable, or the public Wokwi server if it is not set. The environment
+                variable is read when the transport is created, not when the module is
+                imported.
+        """
         self._token = token
-        self._url = url
+        self._url = url or os.getenv("WOKWI_CLI_SERVER") or DEFAULT_WS_URL
         self._next_id = 1
         self._ws: Optional[websockets.WebSocketClientProtocol] = None
         self._event_listeners: dict[str, list[Callable[[EventMessage], Any]]] = {}
