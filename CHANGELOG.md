@@ -3,6 +3,10 @@
 ## 0.5.0 - 2026-10-02
 
 - **Breaking:** drop Python 3.9 support (end of life 2025-10-31; current hatch/mypy no longer run on it). `requires-python` is now `>=3.10`. Python 3.14 added to CI and classifiers.
+- feat: add `sdcards` parameter to `start_simulation()` (`SDCardConfig`) to preload the simulated micro SD card from uploaded files or a raw image
+- feat: add `export_sdcard_image()` and `export_sdcard_files()` to read the micro SD card contents back
+- feat: add `upload_sdcard_folder()` to upload a local directory tree as the card contents in one call
+- fix: raise the WebSocket message size limit (was the `websockets` default of 1 MB), so large responses such as an SD card image no longer close the connection with code 1009
 
 ## 0.4.1 - 2026-10-02
 

@@ -68,6 +68,24 @@ python -m examples.hello_esp32_idf.main
 
 For more examples, see the [examples](examples) directory.
 
+### Micro SD card
+
+If the diagram includes a [micro SD card](https://docs.wokwi.com/parts/wokwi-microsd-card), upload its files under a common prefix and describe the card when starting the simulation. When the simulation is paused, the card contents can be read back as files or as a raw disk image:
+
+```python
+from wokwi_client import SDCardConfig
+
+await client.upload("sdcard/config.json", b'{"volume": 7}')
+await client.start_simulation(firmware="firmware.bin", sdcards=[SDCardConfig(prefix="sdcard/")])
+...
+await client.pause_simulation()
+for file in await client.export_sdcard_files():
+    print(file.name, len(file.content))
+image = await client.export_sdcard_image()  # raw FAT image, e.g. to save as card.img
+```
+
+To upload a whole directory in one call, use `card = await client.upload_sdcard_folder("sdcard")` and pass `sdcards=[card]`. Use `SDCardConfig(image="card.img")` to serve an uploaded raw disk image instead, `size_bytes` to pick the card capacity (default 8 MB), and `part` to address a specific card when the diagram has several.
+
 ## Documentation
 
 The API documentation is available at [https://wokwi.github.io/wokwi-python-client/](https://wokwi.github.io/wokwi-python-client/).

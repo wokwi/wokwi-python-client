@@ -24,8 +24,10 @@ from .framebuffer import (
     read_framebuffer_png_bytes,
     save_framebuffer_png,
 )
+from .models import SDCardConfig, SDCardFile
 from .pins import PinReadMessage, gpio_list, pin_listen, pin_read
 from .protocol_types import EventMessage
+from .sdcard import export_sdcard_files, export_sdcard_image, upload_sdcard_folder
 from .serial import monitor_lines, write_serial
 from .simulation import pause, restart, resume, start
 from .touch import touch_event
@@ -116,6 +118,34 @@ class WokwiClient:
         """
         return await upload_idf_firmware(self._transport, flasher_args_path)
 
+    async def upload_sdcard_folder(
+        self,
+        local_dir: "str | Path",
+        *,
+        part: Optional[str] = None,
+        size_bytes: Optional[int] = None,
+    ) -> SDCardConfig:
+        """
+        Upload a local folder as the contents of a simulated micro SD card.
+
+        Files are uploaded under `sdcard/` (or `sdcard/<part>/`), skipping OS clutter such as
+        `.DS_Store`. Pass the result to `start_simulation(sdcards=[...])`.
+
+        The server keeps uploaded files for the whole session, so uploading a second folder for
+        the same card in one session merges the two; reconnect to start from a clean card.
+
+        Args:
+            local_dir: The folder to upload.
+            part: Diagram part id of the card (optional when the diagram has a single card).
+            size_bytes: Card capacity in bytes (default 8 MB).
+
+        Returns:
+            The `SDCardConfig` describing the card.
+        """
+        return await upload_sdcard_folder(
+            self._transport, local_dir, part=part, size_bytes=size_bytes
+        )
+
     async def download(self, name: str) -> bytes:
         """
         Download a file from the simulator.
@@ -144,13 +174,14 @@ class WokwiClient:
         with open(local_path, "wb") as f:
             f.write(result)
 
-    async def start_simulation(
+    async def start_simulation(  # noqa: PLR0913, PLR0917
         self,
         firmware: "str | list[FlashSection] | None" = None,
         elf: Optional[str] = None,
         pause: bool = False,
         chips: list[str] = [],
         flash_size: Optional[int] = None,
+        sdcards: Optional[list[SDCardConfig]] = None,
     ) -> None:
         """
         Start a new simulation with the given parameters.
@@ -179,6 +210,8 @@ class WokwiClient:
             pause: Whether to start the simulation paused (default: False).
             chips: List of custom chips to load into the simulation (default: empty list).
             flash_size: Flash size in megabytes (optional, typically from IdfFirmwareUploadResult).
+            sdcards: Micro SD card contents, see `SDCardConfig` and `upload_sdcard_folder()`
+                (optional).
         """
         await start(
             self._transport,
@@ -187,7 +220,36 @@ class WokwiClient:
             elf=elf,
             pause=pause,
             chips=chips,
+            sdcards=sdcards,
         )
+
+    async def export_sdcard_image(self, part: Optional[str] = None) -> bytes:
+        """
+        Export the raw disk image of a simulated micro SD card.
+
+        Pause the simulation first (`pause_simulation()`) for a consistent snapshot.
+
+        Args:
+            part: Diagram part id of the card (optional when the diagram has a single card).
+
+        Returns:
+            The raw disk image (MBR + FAT filesystem) as bytes.
+        """
+        return await export_sdcard_image(self._transport, part)
+
+    async def export_sdcard_files(self, part: Optional[str] = None) -> list[SDCardFile]:
+        """
+        Export the files on a simulated micro SD card.
+
+        Pause the simulation first (`pause_simulation()`) for a consistent snapshot.
+
+        Args:
+            part: Diagram part id of the card (optional when the diagram has a single card).
+
+        Returns:
+            The files on the card, with `/`-separated names relative to the card root.
+        """
+        return await export_sdcard_files(self._transport, part)
 
     async def pause_simulation(self) -> None:
         """

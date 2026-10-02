@@ -4,6 +4,7 @@
 
 from typing import Any, Optional
 
+from .models import SDCardConfig
 from .protocol_types import ResponseMessage
 from .transport import Transport
 
@@ -16,6 +17,7 @@ async def start(  # noqa: PLR0913
     elf: Optional[str] = None,
     pause: bool = False,
     chips: list[str] = [],
+    sdcards: Optional[list[SDCardConfig]] = None,
 ) -> ResponseMessage:
     params: dict[str, Any] = {"elf": elf, "pause": pause, "chips": chips}
     if isinstance(firmware, list):
@@ -24,6 +26,8 @@ async def start(  # noqa: PLR0913
         params["firmware"] = firmware
     if flash_size:
         params["flashSize"] = flash_size
+    if sdcards:
+        params["sdcards"] = [card.model_dump(by_alias=True, exclude_none=True) for card in sdcards]
     return await transport.request("sim:start", params)
 
 

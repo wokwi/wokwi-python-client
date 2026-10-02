@@ -14,6 +14,7 @@ import websockets
 from .__version__ import get_version
 from .constants import (
     DEFAULT_WS_URL,
+    MAX_MESSAGE_SIZE,
     MSG_TYPE_EVENT,
     MSG_TYPE_HELLO,
     MSG_TYPE_RESPONSE,
@@ -49,6 +50,7 @@ class Transport:
                 "Authorization": f"Bearer {self._token}",
                 "User-Agent": f"wokwi-client-py/{get_version()}",
             },
+            max_size=MAX_MESSAGE_SIZE,
         )
         hello: IncomingMessage = await self._recv()
         if hello["type"] != MSG_TYPE_HELLO or hello.get("protocolVersion") != PROTOCOL_VERSION:
