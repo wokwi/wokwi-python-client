@@ -6,6 +6,8 @@
 - feat: add `sdcards` parameter to `start_simulation()` (`SDCardConfig`) to preload the simulated micro SD card from uploaded files or a raw image
 - feat: add `export_sdcard_image()` and `export_sdcard_files()` to read the micro SD card contents back
 - feat: add `upload_sdcard_folder()` to upload a local directory tree as the card contents in one call
+- feat: add `upload_text()`; `upload_file()` now uploads `.json` files as text, which the server requires for custom chip definitions (`<chip>.chip.json`) (#17, thanks @lucasssvaz)
+- fix: `download()` now returns files that were uploaded as text
 - fix: raise the WebSocket message size limit (was the `websockets` default of 1 MB), so large responses such as an SD card image no longer close the connection with code 1009
 
 ## 0.4.1 - 2026-10-02

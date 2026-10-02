@@ -12,6 +12,11 @@ class UploadParams(BaseModel):
     binary: str  # base64
 
 
+class TextUploadParams(BaseModel):
+    name: str
+    text: str
+
+
 class SimulationParams(BaseModel):
     firmware: str
     elf: str

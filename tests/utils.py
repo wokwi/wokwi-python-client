@@ -1,8 +1,6 @@
 """
-Test utilities for running example modules.
-
-Provides a helper to execute `python -m <module>` with a short sleep to keep
-CI fast and shared environment handling (WOKWI_CLI_TOKEN, etc.).
+Test utilities: a fake transport for unit tests, and a helper to run example modules
+(`python -m <module>`) against a live server for the integration tests.
 """
 
 from __future__ import annotations
@@ -12,6 +10,29 @@ import subprocess
 import sys
 from collections.abc import Mapping
 from subprocess import CompletedProcess
+from typing import Any
+
+from wokwi_client.protocol_types import ResponseMessage
+from wokwi_client.transport import Transport
+
+
+class FakeTransport(Transport):
+    """Records requests and answers every one with the given `result`."""
+
+    def __init__(self, **result: Any):
+        super().__init__("token")
+        self.result = result
+        self.requests: list[tuple[str, dict[str, Any]]] = []
+
+    async def request(self, command: str, params: dict[str, Any]) -> ResponseMessage:
+        self.requests.append((command, params))
+        return {
+            "type": "response",
+            "command": command,
+            "id": "1",
+            "result": self.result,
+            "error": False,
+        }
 
 
 def run_example_module(

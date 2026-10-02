@@ -8,7 +8,7 @@ from typing import Optional
 
 from wokwi_client.idf import resolveIdfFirmware
 
-from .models import UploadParams
+from .models import TextUploadParams, UploadParams
 from .protocol_types import ResponseMessage
 from .transport import Transport
 
@@ -32,9 +32,12 @@ class IdfFirmwareUploadResult:
 async def upload_file(
     transport: Transport, filename: str, local_path: Optional[Path] = None
 ) -> str:
-    firmware_path = local_path or filename
-    content = Path(firmware_path).read_bytes()
-    await upload(transport, filename, content)
+    path = Path(local_path or filename)
+    # The server needs JSON (diagram, custom chips) as text, same as the Wokwi CLI
+    if Path(filename).suffix == ".json":
+        await upload_text(transport, filename, path.read_text(encoding="utf-8-sig"))
+    else:
+        await upload(transport, filename, path.read_bytes())
     return filename
 
 
@@ -52,6 +55,11 @@ async def upload_idf_firmware(
 
 async def upload(transport: Transport, name: str, content: bytes) -> ResponseMessage:
     params = UploadParams(name=name, binary=base64.b64encode(content).decode())
+    return await transport.request("file:upload", params.model_dump())
+
+
+async def upload_text(transport: Transport, name: str, text: str) -> ResponseMessage:
+    params = TextUploadParams(name=name, text=text)
     return await transport.request("file:upload", params.model_dump())
 
 

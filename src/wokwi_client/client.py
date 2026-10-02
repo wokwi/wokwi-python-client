@@ -19,6 +19,7 @@ from .file_ops import (
     upload,
     upload_file,
     upload_idf_firmware,
+    upload_text,
 )
 from .framebuffer import (
     read_framebuffer_png_bytes,
@@ -92,9 +93,21 @@ class WokwiClient:
         """
         await upload(self._transport, name, content)
 
+    async def upload_text(self, name: str, text: str) -> None:
+        """
+        Upload a text file to the simulator from a string.
+
+        The server needs JSON files such as `diagram.json` and `<chip_name>.chip.json` as text.
+
+        Args:
+            name: The name to use for the uploaded file.
+            text: The file content.
+        """
+        await upload_text(self._transport, name, text)
+
     async def upload_file(self, filename: str, local_path: Optional[Path] = None) -> str:
         """
-        Upload a local file to the simulator.
+        Upload a local file to the simulator. `.json` files are uploaded as text.
 
         Args:
             filename: The name to use for the uploaded file.
@@ -156,8 +169,11 @@ class WokwiClient:
         Returns:
             The downloaded file content as bytes.
         """
-        result = await download(self._transport, name)
-        return base64.b64decode(result["result"]["binary"])
+        result = (await download(self._transport, name))["result"]
+        if "text" in result:
+            text: str = result["text"]
+            return text.encode()
+        return base64.b64decode(result["binary"])
 
     async def download_file(self, name: str, local_path: Optional[Path] = None) -> None:
         """

@@ -7,32 +7,14 @@
 import asyncio
 import base64
 from pathlib import Path
-from typing import Any
 
 from wokwi_client import SDCardConfig, SDCardFile
-from wokwi_client.protocol_types import ResponseMessage
 from wokwi_client.sdcard import export_sdcard_files, upload_sdcard_folder
 from wokwi_client.simulation import start
-from wokwi_client.transport import Transport
+
+from .utils import FakeTransport
 
 MB = 1024 * 1024
-
-
-class FakeTransport(Transport):
-    def __init__(self, **result: Any):
-        super().__init__("token")
-        self.result = result
-        self.requests: list[tuple[str, dict[str, Any]]] = []
-
-    async def request(self, command: str, params: dict[str, Any]) -> ResponseMessage:
-        self.requests.append((command, params))
-        return {
-            "type": "response",
-            "command": command,
-            "id": "1",
-            "result": self.result,
-            "error": False,
-        }
 
 
 def test_start_sends_sdcards_in_wire_format() -> None:
