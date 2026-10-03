@@ -4,14 +4,10 @@
 
 from importlib.metadata import PackageNotFoundError, version
 
-try:  # works for normal + editable installs
-    __version__: str = version(__name__.replace("_", "-"))
-except PackageNotFoundError:  # running from a raw source tree
-    try:
-        # if you use hatch-vcs, this tiny module is auto-generated at build time
-        from ._version import version as __version__  # type: ignore
-    except ModuleNotFoundError:
-        __version__ = "0.0.0+local"
+try:
+    __version__ = version("wokwi-client")
+except PackageNotFoundError:  # source tree that was never installed
+    __version__ = "0.0.0+local"
 
 
 def get_version() -> str:

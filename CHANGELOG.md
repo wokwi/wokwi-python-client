@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.1 - 2026-10-03
+
+- fix: `wokwi_client.__version__` reported `0.0.0+local` in every release; it now reports the installed version
+
 ## 0.5.0 - 2026-10-02
 
 - **Breaking:** drop Python 3.9 support (end of life 2025-10-31; current hatch/mypy no longer run on it). `requires-python` is now `>=3.10`. Python 3.14 added to CI and classifiers.
